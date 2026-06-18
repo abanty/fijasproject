@@ -1,0 +1,52 @@
+# AI Prediction Engine Rules
+
+The AI prediction engine must be conservative, structured and validated.
+
+Required analysis blocks:
+- Recent form: last 5 official matches.
+- Last 10 matches if last 5 is misleading.
+- Home form for home team.
+- Away form for away team.
+- Table and competitive context.
+- Injuries, suspensions, absences and rotation risk.
+- Goals, xG, xGA, shots, shots on target.
+- Corners and cards.
+- BTTS and over/under trends.
+- Clean sheets and first-goal tendency.
+- H2H with low weight.
+- Odds and value.
+
+Allowed confidence values:
+- HIGH
+- MEDIUM
+- LOW
+- NO_BET
+
+Allowed markets:
+- MATCH_WINNER
+- DOUBLE_CHANCE
+- OVER_UNDER_GOALS
+- BTTS
+- HANDICAP
+- CORNERS
+- CARDS
+
+Force NO_BET when:
+- Critical data is missing.
+- riskScore > 75.
+- valueScore < 45.
+- There are 3 or more contradictory signals.
+- The pick depends mainly on team name or local advantage.
+- Odds do not compensate risk.
+- The match is a trap game.
+
+Never publish raw AI output without backend validation.
+
+Forbidden language:
+- seguro
+- fijo
+- garantizado
+- gratis
+- dinero facil
+- apuesta segura
+- dinero facil

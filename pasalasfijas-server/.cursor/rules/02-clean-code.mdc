@@ -1,0 +1,29 @@
+# Clean Code Rules
+
+General:
+- Prefer simple, explicit and maintainable code.
+- Do not over-engineer the MVP.
+- Avoid large files.
+- Avoid deeply nested conditionals.
+- Extract business rules into services/use cases.
+- Use descriptive names.
+- Do not use magic numbers without constants.
+- Prefer early returns.
+- Do not duplicate business logic across layers.
+
+Backend:
+- Use TypeScript types intentionally.
+- Avoid `any` unless there is no practical alternative.
+- Keep controllers thin.
+- Keep use cases explicit.
+- Keep Prisma in infrastructure.
+- Keep OpenAI in infrastructure.
+- Do not leak Prisma implementation details into controllers.
+
+Comments:
+- Comment why, not what.
+- Document non-obvious betting, AI and risk rules.
+
+Refactoring:
+- Before adding code, inspect existing patterns.
+- Prefer extending current conventions over replacing architecture.

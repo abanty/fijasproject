@@ -1,0 +1,44 @@
+# Backend Architecture Rules
+
+Use DDD anemic + lightweight hexagonal architecture inside a modular NestJS monolith.
+
+Each business module should follow this structure:
+
+```txt
+src/modules/{module}/
+  domain/
+    entities/
+    enums/
+    repositories/
+    ports/
+  application/
+    use-cases/
+    services/
+  infrastructure/
+    prisma/
+    providers/
+    mappers/
+    openai/
+  presentation/
+    controllers/
+    dto/
+    guards/
+```
+
+Layer direction:
+
+```txt
+presentation -> application -> domain ports/repositories -> infrastructure adapters
+```
+
+Rules:
+- Controllers must be thin.
+- Controllers call use cases only.
+- Business logic lives in application use cases or application services.
+- Domain contains entities, enums, ports and repository contracts.
+- Infrastructure contains Prisma, OpenAI and external provider implementations.
+- Do not inject PrismaService directly into controllers.
+- Do not call OpenAI directly from controllers or use cases.
+- Use explicit use case names.
+- Prefer small files and clear names.
+- Avoid overengineering before the MVP is validated.

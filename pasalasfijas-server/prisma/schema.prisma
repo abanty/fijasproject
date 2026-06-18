@@ -1,0 +1,428 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+  TRIALING
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+  CANCELLED
+}
+
+enum Side {
+  HOME
+  AWAY
+}
+
+enum ConfidenceLevel {
+  HIGH
+  MEDIUM
+  LOW
+  NO_BET
+}
+
+enum AnalysisStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REVIEW_REQUIRED
+}
+
+enum PickMarket {
+  MATCH_WINNER
+  DOUBLE_CHANCE
+  OVER_UNDER_GOALS
+  BTTS
+  HANDICAP
+  CORNERS
+  CARDS
+}
+
+enum PickType {
+  MAIN
+  ALTERNATIVE
+  COMBO_LEG
+}
+
+enum PickResultStatus {
+  PENDING
+  WON
+  LOST
+  VOID
+  HALF_WON
+  HALF_LOST
+}
+
+enum AccessType {
+  FREE_UNLOCK
+  PREMIUM
+  ADMIN
+}
+
+model User {
+  id              String               @id @default(uuid())
+  email           String               @unique
+  passwordHash    String
+  name            String?
+  role            UserRole             @default(USER)
+  status          UserStatus           @default(ACTIVE)
+  profile         UserProfile?
+  subscriptions   Subscription[]
+  predictionViews UserPredictionView[]
+  bankroll        UserBankroll?
+  betTrackings    UserBetTracking[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model UserProfile {
+  id                String  @id @default(uuid())
+  userId            String  @unique
+  country           String?
+  timezone          String? @default("America/Lima")
+  preferredLanguage String? @default("es")
+  avatarUrl         String?
+  riskPreference    String? @default("CONSERVATIVE")
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Plan {
+  id                    String         @id @default(uuid())
+  code                  String         @unique
+  name                  String
+  price                 Decimal        @default(0)
+  currency              String         @default("USD")
+  dailyFreePredictions  Int            @default(2)
+  canViewAllPredictions Boolean        @default(false)
+  canViewCombos         Boolean        @default(false)
+  canViewStake          Boolean        @default(false)
+  canViewHistory        Boolean        @default(false)
+  isActive              Boolean        @default(true)
+  subscriptions         Subscription[]
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String
+  planId                 String
+  status                 SubscriptionStatus @default(ACTIVE)
+  startedAt              DateTime           @default(now())
+  expiresAt              DateTime?
+  provider               String?
+  providerCustomerId     String?
+  providerSubscriptionId String?
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                   Plan               @relation(fields: [planId], references: [id])
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([userId, status])
+}
+
+model Competition {
+  id         String   @id @default(uuid())
+  externalId String?
+  name       String
+  country    String?
+  type       String?
+  logoUrl    String?
+  seasons    Season[]
+  matches    Match[]
+}
+
+model Season {
+  id            String      @id @default(uuid())
+  competitionId String
+  externalId    String?
+  name          String?
+  year          Int?
+  startDate     DateTime?
+  endDate       DateTime?
+  status        String?
+  competition   Competition @relation(fields: [competitionId], references: [id])
+  matches       Match[]
+}
+
+model Team {
+  id          String                   @id @default(uuid())
+  externalId  String?
+  name        String
+  shortName   String?
+  country     String?
+  logoUrl     String?
+  homeMatches Match[]                  @relation("HomeTeam")
+  awayMatches Match[]                  @relation("AwayTeam")
+  absences    PlayerAbsence[]
+  forms       TeamRecentForm[]
+  stats       MatchTeamStatsSnapshot[]
+  standings   StandingSnapshot[]
+}
+
+model Match {
+  id             String                   @id @default(uuid())
+  externalId     String?
+  competitionId  String
+  seasonId       String?
+  homeTeamId     String
+  awayTeamId     String
+  kickoffAt      DateTime
+  status         MatchStatus              @default(SCHEDULED)
+  venue          String?
+  homeScore      Int?
+  awayScore      Int?
+  winnerTeamId   String?
+  competition    Competition              @relation(fields: [competitionId], references: [id])
+  season         Season?                  @relation(fields: [seasonId], references: [id])
+  homeTeam       Team                     @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam       Team                     @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  forms          TeamRecentForm[]
+  statsSnapshots MatchTeamStatsSnapshot[]
+  standings      StandingSnapshot[]
+  absences       PlayerAbsence[]
+  odds           OddsSnapshot[]
+  analyses       AiAnalysis[]
+  picks          Pick[]
+  predictionViews UserPredictionView[]
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+
+  @@index([kickoffAt])
+  @@index([status])
+  @@index([competitionId])
+}
+
+model TeamRecentForm {
+  id            String   @id @default(uuid())
+  teamId        String
+  matchId       String?
+  scope         String
+  last5Summary  Json?
+  last10Summary Json?
+  wins          Int      @default(0)
+  draws         Int      @default(0)
+  losses        Int      @default(0)
+  goalsFor      Int      @default(0)
+  goalsAgainst  Int      @default(0)
+  cleanSheets   Int      @default(0)
+  failedToScore Int      @default(0)
+  avgXg         Decimal?
+  avgXga        Decimal?
+  team          Team     @relation(fields: [teamId], references: [id])
+  match         Match?   @relation(fields: [matchId], references: [id])
+  createdAt     DateTime @default(now())
+}
+
+model MatchTeamStatsSnapshot {
+  id                String   @id @default(uuid())
+  matchId           String
+  teamId            String
+  side              Side
+  goalsForAvg       Decimal?
+  goalsAgainstAvg   Decimal?
+  xgAvg             Decimal?
+  xgaAvg            Decimal?
+  shotsAvg          Decimal?
+  shotsOnTargetAvg  Decimal?
+  cornersForAvg     Decimal?
+  cornersAgainstAvg Decimal?
+  cardsAvg          Decimal?
+  bttsRate          Decimal?
+  over15Rate        Decimal?
+  over25Rate        Decimal?
+  over35Rate        Decimal?
+  cleanSheetRate    Decimal?
+  firstGoalRate     Decimal?
+  match             Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team              Team     @relation(fields: [teamId], references: [id])
+  createdAt         DateTime @default(now())
+}
+
+model StandingSnapshot {
+  id             String   @id @default(uuid())
+  matchId        String
+  teamId         String
+  position       Int?
+  points         Int?
+  played         Int?
+  wins           Int?
+  draws          Int?
+  losses         Int?
+  goalsFor       Int?
+  goalsAgainst   Int?
+  goalDifference Int?
+  contextLabel   String?
+  match          Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team           Team     @relation(fields: [teamId], references: [id])
+  createdAt      DateTime @default(now())
+}
+
+model PlayerAbsence {
+  id         String   @id @default(uuid())
+  matchId    String
+  teamId     String
+  playerName String
+  reason     String?
+  importance String?
+  position   String?
+  isStarter  Boolean  @default(false)
+  source     String?
+  match      Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team       Team     @relation(fields: [teamId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model OddsSnapshot {
+  id                 String   @id @default(uuid())
+  matchId            String
+  market             String
+  selection          String
+  odd                Decimal
+  impliedProbability Decimal?
+  provider           String?
+  capturedAt         DateTime @default(now())
+  match              Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+}
+
+model AiAnalysis {
+  id            String          @id @default(uuid())
+  matchId       String
+  model         String
+  promptVersion String
+  inputHash     String?
+  status        AnalysisStatus  @default(PENDING)
+  confidence    ConfidenceLevel @default(LOW)
+  riskScore     Int?
+  summary       String?
+  reasonToBet   String?
+  reasonToAvoid String?
+  conclusion    String?
+  noBetReason   String?
+  rawInputJson  Json?
+  rawOutputJson Json?
+  match         Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  picks         Pick[]
+  comboBets     ComboBet[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([matchId])
+}
+
+model Pick {
+  id                   String           @id @default(uuid())
+  analysisId           String
+  matchId              String
+  market               PickMarket
+  selection            String
+  pickType             PickType         @default(ALTERNATIVE)
+  confidence           ConfidenceLevel
+  riskScore            Int?
+  valueScore           Int?
+  suggestedStakePercent Int?
+  odd                  Decimal?
+  probabilityEstimated Decimal?
+  expectedValue        Decimal?
+  rationale            String?
+  status               String           @default("PUBLISHED")
+  resultStatus         PickResultStatus @default(PENDING)
+  analysis             AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  match                Match            @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  comboLegs            ComboBetLeg[]
+  userTrackings        UserBetTracking[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  @@index([matchId])
+  @@index([analysisId])
+}
+
+model ComboBet {
+  id                   String           @id @default(uuid())
+  analysisId           String
+  title                String
+  confidence           ConfidenceLevel
+  riskScore            Int?
+  totalOdd             Decimal?
+  suggestedStakePercent Int?
+  rationale            String?
+  status               String           @default("PUBLISHED")
+  resultStatus         PickResultStatus @default(PENDING)
+  analysis             AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  legs                 ComboBetLeg[]
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+}
+
+model ComboBetLeg {
+  id         String   @id @default(uuid())
+  comboBetId String
+  pickId     String
+  order      Int      @default(1)
+  comboBet   ComboBet @relation(fields: [comboBetId], references: [id], onDelete: Cascade)
+  pick       Pick     @relation(fields: [pickId], references: [id])
+}
+
+model UserPredictionView {
+  id         String     @id @default(uuid())
+  userId     String
+  matchId    String
+  viewedAt   DateTime   @default(now())
+  accessType AccessType
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match      Match      @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@index([userId, viewedAt])
+}
+
+model UserBankroll {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  initialAmount Decimal
+  currentAmount Decimal
+  currency      String   @default("USD")
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model UserBetTracking {
+  id          String           @id @default(uuid())
+  userId      String
+  pickId      String
+  stakeAmount Decimal
+  oddTaken    Decimal?
+  status      PickResultStatus @default(PENDING)
+  profitLoss  Decimal?
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pick        Pick             @relation(fields: [pickId], references: [id])
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([userId])
+}

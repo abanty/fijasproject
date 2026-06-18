@@ -1,0 +1,27 @@
+# API Integration Rules
+
+Use a service layer for backend communication.
+
+Environment variables:
+- NEXT_PUBLIC_API_BASE_URL should point to the NestJS backend.
+
+Service rules:
+- Keep fetch wrapper in src/lib/apiClient.js.
+- Keep feature-specific API calls in src/services.
+- Do not call fetch directly from many UI components.
+- Return normalized frontend-friendly data.
+- While backend is unavailable, services may fall back to mock data.
+
+Expected future backend endpoints:
+- GET /predictions/today
+- GET /predictions/matches/:matchId
+- POST /predictions/matches/:matchId/unlock-free
+- GET /predictions/history
+- GET /bankroll
+- GET /bankroll/performance
+
+Security:
+- Do not store JWT tokens in code.
+- Do not expose OpenAI keys in frontend.
+- Do not expose raw AI prompts in public pages.
+- Never rely on frontend blur as real security.

@@ -1,0 +1,40 @@
+# Frontend Architecture Rules
+
+Use Next.js with JavaScript.
+
+Before modifying code:
+1. Inspect existing folders and imports.
+2. Reuse existing aliases from jsconfig.json.
+3. Reuse existing MUI and template conventions.
+4. Avoid installing new libraries unless required.
+5. Keep implementation incremental.
+
+Recommended folders:
+src/components/predictions
+src/components/matches
+src/components/subscription
+src/components/bankroll
+src/services
+src/lib
+src/data/mock
+
+Recommended routes:
+- /dashboard
+- /matches
+- /predictions
+- /history
+- /bankroll
+- /pricing
+
+Component rules:
+- Components should be small and readable.
+- Do not mix API fetching, formatting and large UI blocks in one file.
+- Use shared helpers for formatting confidence, risk and stake.
+- Locked premium content should be masked visually, but backend must enforce access.
+- Always render loading, empty and error states when integrating real APIs.
+
+Access rules:
+- Free users can see 2 full predictions per day.
+- Premium users can see all predictions.
+- Locked cards may show match name, time, competition and teaser information.
+- Locked cards must hide pick, market, stake and rationale.

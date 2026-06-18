@@ -1,0 +1,25 @@
+# Clean Code Rules
+
+General:
+- Prefer explicit names.
+- Avoid large components.
+- Avoid duplicated rendering logic.
+- Extract repeated UI into reusable components.
+- Keep mock data isolated.
+- Keep formatting helpers isolated.
+- Do not introduce unnecessary state management.
+- Use early returns when useful.
+
+Frontend:
+- Use existing MUI components.
+- Use existing template className/Tailwind style conventions when present.
+- Avoid new global CSS unless necessary.
+- Use accessible labels and clear copy.
+- Keep Spanish user-facing text for this product.
+
+Prediction UI:
+- Display confidence clearly.
+- Display risk score clearly.
+- Display stake as index, not as bankroll percentage.
+- Display NO_BET as a valid professional recommendation.
+- Do not promise guaranteed results.

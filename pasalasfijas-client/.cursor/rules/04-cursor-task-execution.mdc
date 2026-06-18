@@ -1,0 +1,26 @@
+# Cursor Task Execution Rules
+
+When asked to implement a feature:
+1. Inspect the existing code first.
+2. Summarize affected files.
+3. Propose a short plan.
+4. Implement only the requested scope.
+5. Avoid unrelated rewrites.
+6. Keep the project buildable.
+7. Summarize changes and next steps.
+
+Preferred MVP order for frontend:
+1. Dashboard shell.
+2. Prediction cards.
+3. Locked premium cards.
+4. Match list.
+5. Pricing page.
+6. History page.
+7. Bankroll page.
+8. API integration once backend exists.
+
+Do not:
+- Replace the template layout.
+- Add payment provider before backend subscription is ready.
+- Add real API keys.
+- Create fake guarantees in betting copy.

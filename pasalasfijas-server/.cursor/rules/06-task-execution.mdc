@@ -1,0 +1,34 @@
+# Task Execution Rules
+
+Before coding:
+1. Read `CURSOR_START_HERE.md` or `docs/backend/CURSOR_START_HERE.md`.
+2. Inspect current structure.
+3. Check package manager. This project uses pnpm.
+4. Create a short plan.
+5. Change only files needed for the requested task.
+6. Keep changes incremental.
+
+MVP order:
+1. Validate install/build/migrations.
+2. Auth and users.
+3. Plans and subscriptions.
+4. Football matches.
+5. Predictions and AI analysis storage.
+6. OpenAI adapter.
+7. Free/premium access.
+8. Admin workflows.
+9. Pick settlement.
+10. Bankroll and performance.
+
+Do not:
+- Add real payment integration yet.
+- Add scraping before the manual/API data flow works.
+- Rewrite the project architecture.
+- Replace pnpm with npm or yarn.
+- Store secrets in code.
+
+After each task, summarize:
+- Files read.
+- Files modified.
+- What changed.
+- How to test it.

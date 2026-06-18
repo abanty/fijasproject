@@ -1,0 +1,29 @@
+# Project Context
+
+This frontend belongs to a football prediction web application with a freemium subscription model.
+
+Stack:
+- Next.js with JavaScript.
+- Material UI template already installed.
+- Backend will be NestJS + Prisma + PostgreSQL.
+- AI provider will be OpenAI.
+
+Product goal:
+Show daily football matches and AI-generated conservative betting recommendations. Free users can view 2 full predictions per day. Premium users can view all predictions, alternative picks, combo bets, stake index, history and performance.
+
+The app is not a bookmaker and does not process real-money bets. It only displays analysis and lets users track picks internally.
+
+Frontend rules:
+- Reuse the current template structure, layouts, theme, MUI components and navigation system.
+- Do not replace the purchased template architecture.
+- Keep critical access rules on the backend. Frontend blur is only visual.
+- Do not hardcode secrets.
+- Use environment variables for API URLs.
+- Keep API access in services, not inside deeply nested UI components.
+- Use mock data only while backend endpoints do not exist.
+
+Prediction rules:
+- Never display words like guaranteed, sure, fixed, safe bet, free money or apuesta segura.
+- Confidence values are HIGH, MEDIUM, LOW and NO_BET.
+- Stake is a 0-100 index, not a direct percentage of the bankroll.
+- The system should allow NO_BET when risk is high or value is unclear.

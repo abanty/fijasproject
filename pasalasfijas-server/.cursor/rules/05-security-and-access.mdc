@@ -1,0 +1,22 @@
+# Security and Access Rules
+
+Authentication:
+- Use JWT bearer auth for protected routes.
+- Hash passwords with bcrypt.
+- Never return passwordHash in API responses.
+- Never expose JWT_SECRET or other environment secrets.
+
+Authorization:
+- Use role guards for admin routes.
+- Use backend subscription/access checks for premium prediction access.
+- Do not rely on frontend blur for security.
+
+Freemium:
+- FREE users can view 2 complete predictions per day.
+- PREMIUM users can view all complete predictions.
+- Access attempts should be recorded with UserPredictionView only when a free unlock is actually consumed.
+
+Secrets:
+- Keep real credentials in `.env` only.
+- Keep `.env.example` safe and fake.
+- Do not commit provider API keys.

@@ -1,0 +1,22 @@
+# Prisma and Database Rules
+
+Use PostgreSQL and Prisma.
+
+Rules:
+- Use UUID primary keys.
+- Use Decimal for odds, money, expected value and probabilities.
+- Use enums for stable domain values.
+- Keep raw provider and AI data in JSON only when needed.
+- Add indexes for frequent queries.
+- Do not drop or rename fields without explicit approval.
+- Seed FREE and PREMIUM plans.
+- Do not commit `.env` or real secrets.
+
+Critical access rule:
+`UserPredictionView` controls the daily free prediction limit. Frontend blur is visual only; backend enforces access.
+
+Recommended migration order:
+1. `pnpm prisma generate`
+2. `pnpm prisma migrate dev --name init`
+3. `pnpm db:seed`
+4. `pnpm start:dev`

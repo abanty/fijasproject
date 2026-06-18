@@ -1,0 +1,47 @@
+# Project Context
+
+PasalasFijas API is the backend for a freemium football prediction platform powered by AI.
+
+Stack:
+- NestJS with TypeScript.
+- Prisma ORM.
+- PostgreSQL.
+- pnpm.
+- OpenAI prepared as the AI provider.
+- DDD anemic entities.
+- Lightweight hexagonal architecture.
+
+Product model:
+- Free users can view 2 complete predictions per day.
+- Premium users can view all complete predictions.
+- Locked predictions may be previewed by the frontend, but the backend must enforce access.
+- The app is not a bookmaker and does not process real-money bets.
+
+Core business domains:
+- auth
+- users
+- plans
+- subscriptions
+- football
+- predictions
+- ai-analysis
+- bankroll
+- admin
+
+Core business concepts:
+- Match
+- Team
+- AiAnalysis
+- Pick
+- ComboBet
+- Confidence
+- RiskScore
+- ValueScore
+- NO_BET
+- UserPredictionView
+- Bankroll
+
+Main business rule:
+Never force a pick. If data is missing, risk is high, odds have no value, or signals contradict each other, return or force NO_BET.
+
+Never expose raw secrets, provider tokens, or sensitive internals in API responses.
