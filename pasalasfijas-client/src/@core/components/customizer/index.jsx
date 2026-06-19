@@ -31,14 +31,11 @@ import SkinBordered from '@core/svg/SkinBordered'
 import LayoutVertical from '@core/svg/LayoutVertical'
 import LayoutCollapsed from '@core/svg/LayoutCollapsed'
 import LayoutHorizontal from '@core/svg/LayoutHorizontal'
-import ContentCompact from '@core/svg/ContentCompact'
-import ContentWide from '@core/svg/ContentWide'
 import DirectionLtr from '@core/svg/DirectionLtr'
 import DirectionRtl from '@core/svg/DirectionRtl'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
-import themePresets from '@configs/themePresets'
 import { fontFamilyCatalog, getFontFamilyOption } from '@configs/fontFamilyOptions'
 
 // Hook Imports
@@ -49,9 +46,6 @@ import { shouldUseHelpTooltip } from '@/lib/ui/helpText'
 
 // Style Imports
 import styles from './styles.module.css'
-
-const WORLD_CUP_PRESET_HELP =
-  'Base Flashscore editable: ajusta color primario, modo y fondos internos abajo.'
 
 const COMPACT_UI_HELP =
   'Tipografía más pequeña y filas mejor distribuidas, sin apretar el padding.'
@@ -124,20 +118,6 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
     }
   }
 
-  const handlePresetChange = preset => {
-    const updates = { themePreset: preset.id }
-
-    if (preset.primaryColor) {
-      updates.primaryColor = preset.primaryColor
-    }
-
-    if (preset.id === 'world-cup' && settings.mode === 'light') {
-      updates.mode = 'dark'
-    }
-
-    updateSettings(updates)
-  }
-
   const handleThemeSurfaceColor = (field, color) => {
     if (field === 'primaryColor') {
       updateSettings({ primaryColor: color })
@@ -182,49 +162,10 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
               <ThemeSettingsTransfer />
               <hr className={styles.hr} />
               <Chip label='Theming' size='small' color='primary' variant='tonal' className='self-start rounded-sm' />
-              <div className='flex flex-col gap-2.5'>
-                <p className='font-medium'>Temas especiales</p>
-                <div className='flex items-center gap-4 flex-wrap'>
-                  {themePresets.map(preset => (
-                    <div key={preset.id} className='flex flex-col items-start gap-0.5'>
-                      <div
-                        className={classnames(styles.presetWrapper, {
-                          [styles.active]: settings.themePreset === preset.id
-                        })}
-                        onClick={() => handlePresetChange(preset)}
-                      >
-                        <div
-                          className={styles.presetPreview}
-                          style={{
-                            background: preset.preview.via
-                              ? `linear-gradient(135deg, ${preset.preview.from} 0%, ${preset.preview.via} 45%, ${preset.preview.to} 100%)`
-                              : `linear-gradient(135deg, ${preset.preview.from} 0%, ${preset.preview.to} 100%)`
-                          }}
-                        >
-                          <i className={classnames(preset.icon, 'text-[22px] text-white drop-shadow-sm')} />
-                        </div>
-                      </div>
-                      <p className={styles.itemLabel} onClick={() => handlePresetChange(preset)}>
-                        {preset.label}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                {settings.themePreset === 'world-cup' ? (
-                  shouldUseHelpTooltip(WORLD_CUP_PRESET_HELP) ? (
-                    <div className='flex items-center gap-1'>
-                      <p className='text-xs text-textSecondary'>Preset Mundial</p>
-                      <HelpInfoTooltip title={WORLD_CUP_PRESET_HELP} />
-                    </div>
-                  ) : (
-                    <p className='text-xs text-textSecondary'>{WORLD_CUP_PRESET_HELP}</p>
-                  )
-                ) : null}
-              </div>
               <ThemeSurfaceSection settings={settings} onChange={handleThemeSurfaceColor} styles={styles} />
               <div className='flex flex-col gap-2.5'>
-                <p className='font-medium'>Mode</p>
-                <div className='flex items-center justify-between'>
+                <p className='font-medium'>Modo</p>
+                <div className='flex items-center gap-4'>
                   <div className='flex flex-col items-start gap-0.5'>
                     <div
                       className={classnames(styles.itemWrapper, styles.modeWrapper, {
@@ -249,19 +190,6 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
                     </div>
                     <p className={styles.itemLabel} onClick={() => handleChange('mode', 'dark')}>
                       Dark
-                    </p>
-                  </div>
-                  <div className='flex flex-col items-start gap-0.5'>
-                    <div
-                      className={classnames(styles.itemWrapper, styles.modeWrapper, {
-                        [styles.active]: settings.mode === 'system'
-                      })}
-                      onClick={() => handleChange('mode', 'system')}
-                    >
-                      <i className='ri-computer-line text-[30px]' />
-                    </div>
-                    <p className={styles.itemLabel} onClick={() => handleChange('mode', 'system')}>
-                      System
                     </p>
                   </div>
                 </div>
@@ -398,57 +326,6 @@ const Customizer = ({ breakpoint = 'lg', dir = 'ltr', disableDirection = false }
                     </div>
                     <p className={styles.itemLabel} onClick={() => handleChange('layout', 'horizontal')}>
                       Horizontal
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className='flex flex-col gap-2.5'>
-                <p className='font-medium'>Content</p>
-                <div className='flex items-center gap-4'>
-                  <div className='flex flex-col items-start gap-0.5'>
-                    <div
-                      className={classnames(styles.itemWrapper, {
-                        [styles.active]: settings.contentWidth === 'compact'
-                      })}
-                      onClick={() =>
-                        updateSettings({
-                          navbarContentWidth: 'compact',
-                          contentWidth: 'compact',
-                          footerContentWidth: 'compact'
-                        })
-                      }
-                    >
-                      <ContentCompact />
-                    </div>
-                    <p
-                      className={styles.itemLabel}
-                      onClick={() =>
-                        updateSettings({
-                          navbarContentWidth: 'compact',
-                          contentWidth: 'compact',
-                          footerContentWidth: 'compact'
-                        })
-                      }
-                    >
-                      Compact
-                    </p>
-                  </div>
-                  <div className='flex flex-col items-start gap-0.5'>
-                    <div
-                      className={classnames(styles.itemWrapper, { [styles.active]: settings.contentWidth === 'wide' })}
-                      onClick={() =>
-                        updateSettings({ navbarContentWidth: 'wide', contentWidth: 'wide', footerContentWidth: 'wide' })
-                      }
-                    >
-                      <ContentWide />
-                    </div>
-                    <p
-                      className={styles.itemLabel}
-                      onClick={() =>
-                        updateSettings({ navbarContentWidth: 'wide', contentWidth: 'wide', footerContentWidth: 'wide' })
-                      }
-                    >
-                      Wide
                     </p>
                   </div>
                 </div>

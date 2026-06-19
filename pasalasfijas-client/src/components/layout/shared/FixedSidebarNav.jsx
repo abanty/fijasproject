@@ -22,6 +22,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Component Imports
 import Link from '@components/Link'
+import RemixIcon from '@components/shared/RemixIcon'
 
 // Context Imports
 import { useSidebarNav } from '@/contexts/sidebarNavContext'
@@ -31,8 +32,6 @@ import sidebarMenuData from '@/data/navigation/sidebarMenuData'
 
 // Util Imports
 import { isSidebarNavActive } from '@/lib/navigation/isNavActive'
-
-const SIDEBAR_WIDTH = 260
 
 const SidebarNavContent = ({ onNavigate }) => {
   const pathname = usePathname()
@@ -54,7 +53,7 @@ const SidebarNavContent = ({ onNavigate }) => {
 
   return (
     <>
-      <div className='app-sidebar-search-bar'>
+      {/* <div className='app-sidebar-search-bar'>
         <TextField
           size='small'
           className='app-sidebar-nav-search'
@@ -65,13 +64,13 @@ const SidebarNavContent = ({ onNavigate }) => {
             input: {
               startAdornment: (
                 <InputAdornment position='start'>
-                  <i className='ri-search-line text-lg sidebar-search-icon' />
+                  <i className='ri-search-line remix-icon remix-icon--md sidebar-search-icon' />
                 </InputAdornment>
               )
             }
           }}
         />
-      </div>
+      </div> */}
 
       <div className='app-sidebar-nav-scroll'>
         <PerfectScrollbar
@@ -81,20 +80,16 @@ const SidebarNavContent = ({ onNavigate }) => {
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            gap: '1.25rem',
-            paddingInlineEnd: 'var(--app-sidebar-nav-scroll-padding-inline-end, 1.625rem)'
+            gap: '1.25rem'
           }}
           options={{ wheelPropagation: false, suppressScrollX: true }}
         >
         {filteredSections.map(section => (
-          <div key={section.section} className='flex flex-col gap-1'>
-            <Typography
-              variant='caption'
-              className='sidebar-section-label px-2'
-            >
+          <div key={section.section} className='flex flex-col gap-3'>
+            <Typography variant='captionSidebar' className='sidebar-section-label px-2'>
               {section.section}
             </Typography>
-            <List disablePadding className='flex flex-col gap-0.5'>
+            <List disablePadding className='flex flex-col gap-1.5'>
               {section.items.map(item => {
                 const active = isSidebarNavActive(pathname, item)
 
@@ -110,7 +105,7 @@ const SidebarNavContent = ({ onNavigate }) => {
                     })}
                   >
                     <ListItemIcon className='min-is-9'>
-                      <i className={classnames(item.icon, 'text-xl')} />
+                      <RemixIcon icon={item.icon} size='md' />
                     </ListItemIcon>
                     <ListItemText
                       primary={item.label}
@@ -153,7 +148,7 @@ const FixedSidebarNav = () => {
         sx={{
           display: { xs: 'block', lg: 'none' },
           '& .MuiDrawer-paper': {
-            inlineSize: SIDEBAR_WIDTH,
+            inlineSize: 'var(--sidebar-width)',
             boxSizing: 'border-box',
             blockSize: '100dvh',
             maxBlockSize: '100dvh'

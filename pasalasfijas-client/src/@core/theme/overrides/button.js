@@ -1,6 +1,8 @@
 // Config Imports
 import themeConfig from '@configs/themeConfig'
 
+import buttonTonalVariants from './buttonTonalVariants'
+
 const iconStyles = size => ({
   '& > *:nth-of-type(1)': {
     ...(size === 'small'
@@ -311,7 +313,8 @@ const button = {
                 backgroundColor: 'var(--mui-palette-success-main)'
               }
             }
-          }
+          },
+          ...buttonTonalVariants
         ]
       }),
       contained: ({ ownerState }) => ({

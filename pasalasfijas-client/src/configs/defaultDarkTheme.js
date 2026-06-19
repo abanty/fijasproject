@@ -1,9 +1,11 @@
+export const DEFAULT_DARK_WALLPAPER = '/images/illustrations/wallpapers/scren.jpg'
+
 /** Tema dark por defecto de Pasame La Fija (exportable desde Customizer). */
 const defaultDarkTheme = {
   version: 1,
   app: 'pasame-la-fija',
   template: 'Las fijas',
-  name: 'modo dark',
+  name: 'nuevo tema dark',
   settings: {
     mode: 'dark',
     skin: 'default',
@@ -12,32 +14,39 @@ const defaultDarkTheme = {
     navbarContentWidth: 'compact',
     contentWidth: 'compact',
     footerContentWidth: 'compact',
-    primaryColor: '#0D9394',
+    primaryColor: '#2092EC',
     themePreset: 'default',
     componentDensity: 'compact',
     fontFamily: 'roboto',
     bodyShellWidth: 'boxed',
     rightPanelEnabled: true,
     themeBodyBg: '#070f13',
-    themeBodyBgImageEnabled: false,
+    themeBodyBgImageEnabled: true,
     themeBodyBgGradient: null,
-    themePaperBg: '#132026',
-    themePaperBgGradient: null,
+    themePaperBg: '#060709',
+    themePaperBgGradient: {
+      to: '#10131e',
+      angle: 90
+    },
     themeSidebarBg: 'transparent',
     themeSidebarBgImageEnabled: false,
     themeSidebarBgGradient: null,
     themeCardBorder: 'default',
-    headerBgColor: '#122128',
+    headerBgColor: '#07080d',
     headerBgImageEnabled: false,
-    headerBgGradient: null
+    headerBgGradient: {
+      to: '#07090e',
+      angle: 180
+    }
   },
   images: {
-    body: null,
+    body: DEFAULT_DARK_WALLPAPER,
     header: null,
     sidebar: null
   }
 }
 
 export const defaultDarkThemeSettings = defaultDarkTheme.settings
+export const defaultDarkThemeImages = defaultDarkTheme.images
 
 export default defaultDarkTheme

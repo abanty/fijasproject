@@ -8,7 +8,6 @@ import themeConfig from '@configs/themeConfig'
 import { commonLayoutClasses } from '@layouts/utils/layoutClasses'
 
 const StyledMain = styled.main`
-  padding: var(--layout-padding);
   ${({ isContentCompact }) =>
     isContentCompact &&
     `

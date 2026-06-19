@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 
 // Components Imports
 import CustomAvatar from '@core/components/mui/Avatar'
+import RemixIcon from '@components/shared/RemixIcon'
 import OptionMenu from '@core/components/option-menu'
 
 const CardStatVertical = props => {
@@ -16,7 +17,7 @@ const CardStatVertical = props => {
       <CardContent>
         <div className='flex justify-between items-center is-full mbe-5'>
           <CustomAvatar color={avatarColor} skin={avatarSkin} size={avatarSize} className='shadow-xs'>
-            <i className={avatarIcon} />
+            <RemixIcon icon={avatarIcon} size='md' />
           </CustomAvatar>
           {moreOptions !== false ? (
             <OptionMenu

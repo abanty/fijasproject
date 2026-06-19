@@ -3,11 +3,9 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
 
-// Third-party Imports
-import classnames from 'classnames'
-
 // Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
+import RemixIcon from '@components/shared/RemixIcon'
 
 const HorizontalWithSubtitle = props => {
   const {
@@ -43,7 +41,7 @@ const HorizontalWithSubtitle = props => {
           ) : null}
         </div>
         <CustomAvatar color={avatarColor} skin='light' variant='rounded' size={avatarSize} className='shrink-0'>
-          <i className={classnames(avatarIcon, avatarSize <= 36 ? 'text-[20px]' : 'text-[26px]')} />
+          <RemixIcon icon={avatarIcon} size={avatarSize <= 36 ? 'sm' : 'md'} />
         </CustomAvatar>
       </CardContent>
     </Card>

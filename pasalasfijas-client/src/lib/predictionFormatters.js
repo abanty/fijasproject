@@ -91,3 +91,38 @@ export const formatMatchDayTime = kickoffAt => {
     time
   }
 }
+
+export const formatKickoffRelative = kickoffAt => {
+  if (!kickoffAt) return 'Horario por confirmar'
+
+  const diffMs = new Date(kickoffAt).getTime() - Date.now()
+
+  if (diffMs <= 0) return 'En curso o finalizado'
+
+  const totalMinutes = Math.floor(diffMs / 60000)
+  const days = Math.floor(totalMinutes / (60 * 24))
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
+  const minutes = totalMinutes % 60
+
+  if (days === 0 && hours < 24) {
+    return `Hoy en ${hours}h ${minutes}m`
+  }
+
+  if (days === 1) {
+    return `Mañana en ${hours}h ${minutes}m`
+  }
+
+  return `En ${days}d ${hours}h`
+}
+
+export const formatProbability = value => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '—'
+
+  return `${Number(value).toFixed(1)}%`
+}
+
+export const formatExpectedGoals = value => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '—'
+
+  return Number(value).toFixed(3)
+}

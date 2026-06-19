@@ -1,0 +1,65 @@
+'use client'
+
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Chip from '@mui/material/Chip'
+import Typography from '@mui/material/Typography'
+
+import classnames from 'classnames'
+
+import Link from '@components/Link'
+import RemixIcon from '@components/shared/RemixIcon'
+
+const CompetitionCard = ({ competition, matchCount }) => {
+  const href = `/matches/${competition.slug}`
+  const countLabel =
+    competition.matchCountLabel ??
+    (typeof matchCount === 'number' && matchCount > 0 ? `${matchCount} partidos` : null)
+
+  return (
+    <Card
+      component={Link}
+      href={href}
+      className={classnames('competition-card block no-underline text-inherit', {
+        'competition-card--featured': competition.featured
+      })}
+    >
+      <CardContent className='competition-card__body flex flex-col gap-4 p-5 sm:p-6'>
+        <div className='flex items-start gap-4'>
+          <div className='competition-card__icon flex shrink-0 items-center justify-center'>
+            <RemixIcon icon={competition.icon} size='xl' />
+          </div>
+          <div className='min-is-0 flex flex-col gap-2'>
+            <Typography variant='h6' className='competition-card__title font-semibold leading-snug'>
+              {competition.title}
+            </Typography>
+            <Typography variant='body2' color='text.secondary' className='leading-relaxed'>
+              {competition.description}
+            </Typography>
+          </div>
+        </div>
+
+        <div className='flex items-center justify-between gap-3 mbs-auto'>
+          {countLabel ? (
+            <Chip size='small' variant='tonal' color='primary' label={countLabel} className='competition-card__chip' />
+          ) : (
+            <span />
+          )}
+          <Button
+            component='span'
+            size='small'
+            variant='text'
+            color={competition.featured ? 'primary' : 'inherit'}
+            className='competition-card__cta shrink-0'
+            endIcon={<RemixIcon icon='ri-arrow-right-line' size='sm' />}
+          >
+            Ver partidos
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default CompetitionCard

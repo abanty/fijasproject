@@ -1,3 +1,8 @@
+const cardPadding = {
+  paddingInline: 'var(--card-padding-inline)',
+  paddingBlock: 'var(--card-padding-block)'
+}
+
 const card = skin => {
   return {
     MuiCard: {
@@ -16,8 +21,8 @@ const card = skin => {
     },
     MuiCardHeader: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          padding: theme.spacing(5),
+        root: () => ({
+          ...cardPadding,
           '& + .MuiCardContent-root, & + .MuiCardActions-root': {
             paddingBlockStart: 0
           },
@@ -43,11 +48,11 @@ const card = skin => {
     },
     MuiCardContent: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          padding: theme.spacing(5),
+        root: () => ({
+          ...cardPadding,
           color: 'var(--mui-palette-text-secondary)',
           '&:last-child': {
-            paddingBlockEnd: theme.spacing(5)
+            paddingBlockEnd: 'var(--card-padding-block)'
           },
           '& + .MuiCardHeader-root, & + .MuiCardContent-root, & + .MuiCardActions-root': {
             paddingBlockStart: 0
@@ -61,12 +66,12 @@ const card = skin => {
     },
     MuiCardActions: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          padding: theme.spacing(5),
+        root: () => ({
+          ...cardPadding,
           '&:where(.card-actions-dense)': {
-            padding: theme.spacing(2.5),
+            padding: 'calc(var(--card-padding-block) * 0.5) calc(var(--card-padding-inline) * 0.625)',
             '& .MuiButton-text': {
-              paddingInline: theme.spacing(2.5)
+              paddingInline: 'calc(var(--card-padding-inline) * 0.625)'
             }
           },
           '& + .MuiCardHeader-root, & + .MuiCardContent-root, & + .MuiCardActions-root': {

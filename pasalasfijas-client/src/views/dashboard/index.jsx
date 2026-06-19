@@ -20,9 +20,9 @@ const DashboardView = ({ data }) => {
   return (
     <div className='page-stack flex flex-col gap-6'>
       <div className='page-stack-sm flex flex-col gap-2'>
-        <Typography variant='h4'>Dashboard</Typography>
+        <Typography variant='h4'>Panel del día</Typography>
         <Typography color='text.secondary' variant={compact ? 'body2' : 'body1'}>
-          Resumen diario de predicciones IA para futbol. Analisis conservador, control de riesgo y opcion NO BET.
+          Resumen diario de fijas con lectura conservadora, control de riesgo y opción NO BET.
         </Typography>
       </div>
 
@@ -32,7 +32,7 @@ const DashboardView = ({ data }) => {
         <div className='flex flex-col gap-4'>
           <div className='flex items-center justify-between gap-3'>
             <Typography variant='h5'>Partido del dia</Typography>
-            <Button href='/matches' variant='outlined'>
+            <Button href='/matches' variant='tonal' color='primary'>
               Ver calendario
             </Button>
           </div>
@@ -87,7 +87,7 @@ const DashboardView = ({ data }) => {
         <div className='flex flex-col gap-4'>
           <div className='flex items-center justify-between gap-3'>
             <Typography variant='h5'>Prediccion destacada</Typography>
-            <Button href='/predictions' variant='outlined'>
+            <Button href='/predictions' variant='tonal' color='primary'>
               Ver todas
             </Button>
           </div>

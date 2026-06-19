@@ -1,4 +1,5 @@
 import themeConfig from '@configs/themeConfig'
+import { fontFamilyCatalog } from '@configs/fontFamilyOptions'
 import {
   getDefaultThemeSettingsForMode,
   getModeSurfaceDefaults,
@@ -7,6 +8,12 @@ import {
   MODE_SURFACE_KEYS,
   resolveEffectiveThemeMode
 } from '@configs/modeThemeDefaults'
+
+const IMAGE_ENABLED_KEYS = new Set([
+  'themeBodyBgImageEnabled',
+  'themeSidebarBgImageEnabled',
+  'headerBgImageEnabled'
+])
 
 export const normalizeThemeSettings = (settings = {}, systemPreference = 'light') => {
   const preset = settings.themePreset ?? themeConfig.themePreset ?? 'default'
@@ -22,15 +29,19 @@ export const normalizeThemeSettings = (settings = {}, systemPreference = 'light'
     next.themeSidebarBg = modeDefaults.themeSidebarBg
   }
 
-  if (!next.componentDensity || next.componentDensity === 'default') {
+  if (!next.componentDensity) {
     next.componentDensity = modeDefaults.componentDensity ?? 'compact'
   }
 
-  if (!next.fontFamily || next.fontFamily === 'inter') {
+  const validFontFamilyIds = new Set(fontFamilyCatalog.map(item => item.id))
+
+  if (!next.fontFamily || !validFontFamilyIds.has(next.fontFamily)) {
     next.fontFamily = modeDefaults.fontFamily ?? 'roboto'
   }
 
   MODE_SURFACE_KEYS.forEach(key => {
+    if (IMAGE_ENABLED_KEYS.has(key)) return
+
     const value = next[key]
     const shouldUseModeDefault =
       effectiveMode === 'dark'

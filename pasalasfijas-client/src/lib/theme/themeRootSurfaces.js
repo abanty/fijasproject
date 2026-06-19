@@ -1,7 +1,8 @@
+import { applyCaptionSidebarCssVars } from '@core/theme/typographyTokens'
 import themeConfig from '@configs/themeConfig'
 import { getDefaultThemeSettingsForMode, resolveEffectiveThemeMode } from '@configs/modeThemeDefaults'
 import { getFontFamilyStack } from '@configs/fontFamilyOptions'
-import { getSurfaceContrastTokens } from '@/lib/theme/colorContrast'
+import { getSurfaceContrastTokens, isLightBackground } from '@/lib/theme/colorContrast'
 import { getContrastColorForGradient, resolveSurfaceLayers } from '@/lib/theme/gradientSurface'
 import { normalizeThemeSettings } from '@/lib/theme/normalizeThemeSettings'
 import { resolveThemeSurface } from '@/lib/theme/resolveThemeSurface'
@@ -39,7 +40,7 @@ const buildSurfacePaintVars = (vars, prefix, solidColor, gradientSetting) => {
   setCssVar(vars, `--theme-${prefix}-bg-solid`, layers.solid)
   setCssVar(vars, `--theme-${prefix}-bg-paint`, layers.paint)
   setCssVar(vars, `--theme-${prefix}-bg`, layers.paint)
-  setCssVar(vars, `--theme-${prefix}-bg-gradient-layer`, layers.gradientLayer)
+  setCssVar(vars, `--theme-${prefix}-bg-gradient-layer`, layers.gradientLayer ?? 'none')
 
   return { ...layers, contrastColor }
 }
@@ -52,6 +53,14 @@ const buildSurfaceContrastVars = (vars, prefix, bg) => {
   Object.entries(contrastVarSuffixes).forEach(([tokenKey, suffix]) => {
     setCssVar(vars, `--theme-${prefix}-${suffix}`, contrast[tokenKey])
   })
+}
+
+const OPTIONAL_ROOT_CSS_VARS = ['--theme-card-border', '--header-bg-solid']
+
+const resolveContrastAttribute = color => {
+  if (!color || isTransparentSurface(color)) return null
+
+  return isLightBackground(color) ? 'dark-text' : 'light-text'
 }
 
 export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light') => {
@@ -88,7 +97,25 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
     normalized.themeSidebarBgGradient
   )
 
-  setCssVar(cssVars, '--theme-card-border', cardBorder)
+  const hasCardBorderColor = cardBorder && !isTransparentSurface(cardBorder)
+
+  if (hasCardBorderColor) {
+    setCssVar(cssVars, '--theme-card-border', cardBorder)
+  }
+
+  // Legacy: ya no fuerza bordes; solo skin "bordered" los muestra
+  dataAttributes['data-card-border'] = null
+
+  const bodyContrast = resolveContrastAttribute(bodySurface.contrastColor)
+  const paperContrast = resolveContrastAttribute(paperSurface.contrastColor)
+
+  if (bodyContrast) {
+    dataAttributes['data-body-contrast'] = bodyContrast
+  }
+
+  if (paperContrast) {
+    dataAttributes['data-paper-contrast'] = paperContrast
+  }
 
   buildSurfaceContrastVars(cssVars, 'body', bodySurface.contrastColor)
   buildSurfaceContrastVars(cssVars, 'paper', paperSurface.contrastColor)
@@ -122,6 +149,7 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
     dataAttributes['data-header-bg'] = 'custom'
     dataAttributes['data-header-contrast'] = 'light'
   } else {
+    setCssVar(cssVars, '--header-bg-gradient-layer', 'none')
     dataAttributes['data-header-bg'] = 'default'
     dataAttributes['data-header-contrast'] = 'default'
   }
@@ -144,9 +172,14 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
 
   cssVars['--app-font-family'] = getFontFamilyStack(dataAttributes['data-font-family'])
   cssVars['--body-shell-max-width'] = `${themeConfig.compactContentWidth}px`
-  cssVars['--app-sidebar-nav-scroll-padding-inline-end'] = '1.625rem'
+  cssVars['--app-sidebar-nav-scroll-padding-inline-end'] = '0'
   cssVars['--app-sidebar-nav-item-margin-inline-end'] = '0.5rem'
   cssVars['--app-sidebar-ps-rail-inline-end'] = '0.125rem'
+
+  applyCaptionSidebarCssVars(
+    cssVars,
+    normalized.componentDensity ?? themeConfig.componentDensity ?? 'compact'
+  )
 
   return {
     normalizedSettings: normalized,
@@ -161,6 +194,12 @@ export const applyThemeRootSnapshotToElement = (element, snapshot) => {
 
   Object.entries(snapshot.cssVars).forEach(([name, value]) => {
     element.style.setProperty(name, value)
+  })
+
+  OPTIONAL_ROOT_CSS_VARS.forEach(name => {
+    if (!Object.prototype.hasOwnProperty.call(snapshot.cssVars, name)) {
+      element.style.removeProperty(name)
+    }
   })
 
   Object.entries(snapshot.dataAttributes).forEach(([key, value]) => {

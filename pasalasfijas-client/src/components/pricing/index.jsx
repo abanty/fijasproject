@@ -30,7 +30,7 @@ const Pricing = ({ data }) => {
   return (
     <div className='flex flex-col gap-6'>
       <div className='flex flex-col justify-center items-center gap-2'>
-        <Typography variant='h4'>Planes</Typography>
+        <Typography variant='h4'>Membresías</Typography>
         <div className='flex items-center text-center flex-col mbe-[2.8rem]'>
           <Typography>Empieza gratis y desbloquea mas analisis cuando lo necesites.</Typography>
           <Typography>Elige el plan que mejor se adapte a tu seguimiento diario.</Typography>

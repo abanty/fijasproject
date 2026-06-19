@@ -5,6 +5,10 @@ export const isNavActive = (pathname, href) => {
     return true
   }
 
+  if (href === '/matches' && pathname.startsWith('/matches')) {
+    return true
+  }
+
   return false
 }
 

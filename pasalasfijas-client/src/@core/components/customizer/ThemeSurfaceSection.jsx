@@ -24,6 +24,7 @@ import HelpInfoTooltip from '@components/shared/HelpInfoTooltip'
 
 // Config Imports
 import headerBackgroundConfig from '@configs/headerBackgroundConfig'
+import { getDefaultThemeImagesForMode } from '@configs/modeThemeDefaults'
 import primaryColorConfig from '@configs/primaryColorConfig'
 import {
   findHeaderBgSwatch,
@@ -98,10 +99,16 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
   })
 
   const syncImageUrls = () => {
+    const effectiveMode = settings.mode === 'dark' ? 'dark' : 'light'
+    const defaultImages = getDefaultThemeImagesForMode(effectiveMode)
+    const storedBody = getBodyBackgroundImage()
+    const storedHeader = getHeaderBackgroundImage()
+    const storedSidebar = getSidebarBackgroundImage()
+
     setImageUrls({
-      body: getBodyBackgroundImage(),
-      header: getHeaderBackgroundImage(),
-      sidebar: getSidebarBackgroundImage()
+      body: storedBody ?? (settings.themeBodyBgImageEnabled ? defaultImages.body : null),
+      header: storedHeader ?? (settings.headerBgImageEnabled ? defaultImages.header : null),
+      sidebar: storedSidebar ?? (settings.themeSidebarBgImageEnabled ? defaultImages.sidebar : null)
     })
   }
 
@@ -117,7 +124,7 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
       window.removeEventListener(HEADER_BG_IMAGE_CHANGED, syncImageUrls)
       window.removeEventListener(SIDEBAR_BG_IMAGE_CHANGED, syncImageUrls)
     }
-  }, [])
+  }, [settings.mode, settings.themeBodyBgImageEnabled, settings.headerBgImageEnabled, settings.themeSidebarBgImageEnabled])
 
   const hasBodyImage = settings.themeBodyBgImageEnabled && imageUrls.body
   const hasHeaderImage = settings.headerBgImageEnabled && imageUrls.header

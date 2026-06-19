@@ -54,7 +54,7 @@ const overrides = (skin, density = 'default') => {
     buttonGroup,
     card(skin),
     Checkbox,
-    chip,
+    chip(density),
     dialog(skin),
     drawer(skin),
     fab,

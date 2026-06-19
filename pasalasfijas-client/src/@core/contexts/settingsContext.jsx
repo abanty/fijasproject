@@ -77,10 +77,14 @@ export const SettingsProvider = props => {
     if (!settings.mode || settings.mode === previousMode) return settings
 
     const effectiveMode = resolveEffectiveThemeMode(settings, getSystemPreference())
+    const modeDefaults = getDefaultThemeSettingsForMode(effectiveMode)
 
     return {
       ...settings,
-      ...getModeSurfaceDefaults(effectiveMode)
+      ...getModeSurfaceDefaults(effectiveMode),
+      primaryColor: modeDefaults.primaryColor,
+      componentDensity: modeDefaults.componentDensity,
+      rightPanelEnabled: modeDefaults.rightPanelEnabled
     }
   }
 

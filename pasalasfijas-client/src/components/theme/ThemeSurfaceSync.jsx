@@ -13,9 +13,44 @@ import {
   getSidebarBackgroundImage,
   SIDEBAR_BG_IMAGE_CHANGED
 } from '@core/utils/sidebarBackgroundStorage'
+import { getDefaultThemeImagesForMode } from '@configs/modeThemeDefaults'
 import { applyThemeRootSnapshotToElement, buildThemeRootSnapshot } from '@/lib/theme/themeRootSurfaces'
 
 import { useSettings } from '@core/hooks/useSettings'
+
+let bodyBgImageLoadToken = 0
+
+const syncBodyBackgroundImage = (root, bodyImage) => {
+  if (!bodyImage) {
+    bodyBgImageLoadToken += 1
+    root.style.removeProperty('--theme-body-bg-image')
+    root.dataset.bodyBgImage = 'off'
+    delete root.dataset.bodyBgImageState
+
+    return
+  }
+
+  root.style.setProperty('--theme-body-bg-image', `url("${bodyImage}")`)
+  root.dataset.bodyBgImage = 'on'
+  root.dataset.bodyBgImageState = 'loading'
+
+  const token = ++bodyBgImageLoadToken
+  const img = new Image()
+
+  const markReady = () => {
+    if (token !== bodyBgImageLoadToken) return
+
+    root.dataset.bodyBgImageState = 'ready'
+  }
+
+  img.onload = markReady
+  img.onerror = markReady
+  img.src = bodyImage
+
+  if (img.complete) {
+    markReady()
+  }
+}
 
 const applyClientThemeRoot = (settings, systemPreference) => {
   const root = document.documentElement
@@ -34,15 +69,12 @@ const applyClientThemeRoot = (settings, systemPreference) => {
     root.dataset.sidebarBgImage = 'off'
   }
 
-  const bodyImage = normalized.themeBodyBgImageEnabled ? getBodyBackgroundImage() : null
+  const defaultImages = getDefaultThemeImagesForMode(systemPreference)
+  const bodyImage = normalized.themeBodyBgImageEnabled
+    ? getBodyBackgroundImage() || defaultImages.body || null
+    : null
 
-  if (bodyImage) {
-    root.style.setProperty('--theme-body-bg-image', `url("${bodyImage}")`)
-    root.dataset.bodyBgImage = 'on'
-  } else {
-    root.style.removeProperty('--theme-body-bg-image')
-    root.dataset.bodyBgImage = 'off'
-  }
+  syncBodyBackgroundImage(root, bodyImage)
 
   const headerImage = normalized.headerBgImageEnabled ? getHeaderBackgroundImage() : null
 

@@ -2,6 +2,7 @@
 import Chip from '@mui/material/Chip'
 
 // Component Imports
+import NavItemBadge from '@/components/navigation/NavItemBadge'
 import { SubMenu as HorizontalSubMenu, MenuItem as HorizontalMenuItem } from '@menu/horizontal-menu'
 import { SubMenu as VerticalSubMenu, MenuItem as VerticalMenuItem, MenuSection } from '@menu/vertical-menu'
 
@@ -77,7 +78,6 @@ export const GenerateVerticalMenu = ({ menuData }) => {
 
 // Generate a menu from the menu data array
 export const GenerateHorizontalMenu = ({ menuData }) => {
-  // Hooks
   const renderMenuItems = data => {
     // Use the map method to iterate through the array of menu data
     return data.map((item, index) => {
@@ -106,13 +106,24 @@ export const GenerateHorizontalMenu = ({ menuData }) => {
       }
 
       // If the current item is not a sub menu, return a MenuItem component
-      const { label, icon, prefix, suffix, ...rest } = menuItem
+      const { label, icon, prefix, suffix, highlight, ...rest } = menuItem
 
       // Localize the href
       const href = rest.href
-      const Icon = icon ? <i className={icon} /> : null
+      const baseIcon = icon ? <i className={icon} /> : null
       const menuItemPrefix = prefix && prefix.label ? <Chip size='small' {...prefix} /> : prefix
       const menuItemSuffix = suffix && suffix.label ? <Chip size='small' {...suffix} /> : suffix
+      const highlightText = highlight?.badge ?? highlight?.label
+      const ariaLabel = highlightText ? `${label}, ${highlightText}` : undefined
+      const menuContent =
+        highlight?.badge || highlight?.label ? (
+          <NavItemBadge highlight={highlight}>
+            {baseIcon}
+            {label}
+          </NavItemBadge>
+        ) : (
+          label
+        )
 
       return (
         <HorizontalMenuItem
@@ -121,9 +132,10 @@ export const GenerateHorizontalMenu = ({ menuData }) => {
           suffix={menuItemSuffix}
           {...rest}
           href={href}
-          {...(Icon && { icon: Icon })}
+          aria-label={ariaLabel}
+          {...(baseIcon && !highlight ? { icon: baseIcon } : null)}
         >
-          {label}
+          {menuContent}
         </HorizontalMenuItem>
       )
     })

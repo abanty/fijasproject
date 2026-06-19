@@ -1,3 +1,5 @@
+import { getCaptionSidebarTypography } from './typographyTokens'
+
 const typography = (fontFamily, density = 'default') => {
   const isCompact = density === 'compact'
 
@@ -64,6 +66,7 @@ const typography = (fontFamily, density = 'default') => {
       lineHeight: 1.38462,
       letterSpacing: '0.4px'
     },
+    captionSidebar: getCaptionSidebarTypography(density),
     overline: {
       fontSize: isCompact ? '0.6875rem' : '0.75rem',
       lineHeight: 1.16667,

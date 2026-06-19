@@ -1,5 +1,10 @@
 const typography = {
   MuiTypography: {
+    defaultProps: {
+      variantMapping: {
+        captionSidebar: 'span'
+      }
+    },
     styleOverrides: {
       root: {
         variants: [
@@ -49,6 +54,10 @@ const typography = {
           },
           {
             props: { variant: 'caption' },
+            style: { color: 'var(--mui-palette-text-disabled)', display: 'inline-block' }
+          },
+          {
+            props: { variant: 'captionSidebar' },
             style: { color: 'var(--mui-palette-text-disabled)', display: 'inline-block' }
           },
           {

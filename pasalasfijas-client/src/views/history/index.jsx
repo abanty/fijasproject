@@ -25,8 +25,8 @@ const HistoryView = ({ history }) => {
   return (
     <div className='page-stack flex flex-col gap-6'>
       <div>
-        <Typography variant='h4'>Historial</Typography>
-        <Typography color='text.secondary'>Rendimiento historico de picks publicados y trackeados.</Typography>
+        <Typography variant='h4'>Bitácora de aciertos</Typography>
+        <Typography color='text.secondary'>Seguimiento de fijas publicadas: resultados, precisión y rendimiento.</Typography>
       </div>
 
       <Grid container spacing={6}>
