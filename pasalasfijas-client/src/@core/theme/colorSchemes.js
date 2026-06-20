@@ -274,6 +274,9 @@ const colorSchemes = skin => {
         Chip: {
           defaultBorder: 'var(--mui-palette-divider)'
         },
+        Skeleton: {
+          bg: 'rgb(var(--mui-mainColorChannels-dark) / 0.05)' // o el color que quieras
+        },
         FilledInput: {
           bg: `rgb(var(--mui-mainColorChannels-dark) / 0.06)`,
           hoverBg: `rgb(var(--mui-mainColorChannels-dark) / 0.08)`,

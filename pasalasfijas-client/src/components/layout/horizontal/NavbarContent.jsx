@@ -1,6 +1,8 @@
 'use client'
 
 // Component Imports
+import classnames from 'classnames'
+
 import Link from '@components/Link'
 import NavToggle from './NavToggle'
 import HeaderSearch from '@components/layout/shared/HeaderSearch'
@@ -9,7 +11,6 @@ import ModeDropdown from '@components/layout/shared/ModeDropdown'
 import UserDropdown from '@components/layout/shared/UserDropdown'
 
 // Third-party Imports
-import classnames from 'classnames'
 
 // Hook Imports
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'

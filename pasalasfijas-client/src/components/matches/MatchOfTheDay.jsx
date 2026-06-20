@@ -54,7 +54,7 @@ const MatchOfTheDay = ({ match, showPredictionLink = true }) => {
       <CardContent className={classnames('match-of-day-body', compact && 'match-of-day-body--compact')}>
         <div className='match-of-day-watermark' aria-hidden />
 
-        <div className='flex flex-col gap-3 p-4'>
+        <div className='flex flex-col gap-3 p-2'>
           <div className='match-of-day-badge'>
             <Chip
               size='small'

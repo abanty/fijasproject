@@ -43,6 +43,7 @@ export const normalizeThemeSettings = (settings = {}, systemPreference = 'light'
     if (IMAGE_ENABLED_KEYS.has(key)) return
 
     const value = next[key]
+
     const shouldUseModeDefault =
       effectiveMode === 'dark'
         ? isLegacyLightSurfaceValue(key, value) || value === oppositeDefaults[key]

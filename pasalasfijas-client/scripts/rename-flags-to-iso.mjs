@@ -289,6 +289,7 @@ const run = async () => {
 
     if (nonIsoNames.has(key)) {
       const dest = path.join(nonIsoDir, file)
+
       await fs.rename(path.join(flagsDir, file), dest)
       report.nonIso.push(file)
       continue
@@ -298,6 +299,7 @@ const run = async () => {
 
     if (!iso) {
       const dest = path.join(nonIsoDir, file)
+
       await fs.rename(path.join(flagsDir, file), dest)
       report.unknown.push(file)
       continue
@@ -312,6 +314,7 @@ const run = async () => {
 
   for (const [iso, items] of isoTargets.entries()) {
     const preferredKey = duplicatePreference[iso]
+
     const sorted = [...items].sort((a, b) => {
       if (preferredKey) {
         if (a.key === preferredKey) return -1
@@ -330,6 +333,7 @@ const run = async () => {
 
     for (const dup of rest) {
       const dupDest = path.join(duplicatesDir, dup.file)
+
       await fs.rename(path.join(flagsDir, dup.file), dupDest)
       report.duplicates.push(`${dup.file} → _non-iso/duplicates/${dup.file}`)
     }

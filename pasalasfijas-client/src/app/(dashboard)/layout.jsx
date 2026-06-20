@@ -17,18 +17,21 @@ import Customizer from '@core/components/customizer'
 import ScrollToTop from '@core/components/scroll-to-top'
 
 // Util Imports
-import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import { getThemeCookieState } from '@core/utils/serverHelpers'
 
 const Layout = async props => {
   const { children } = props
 
-  // Vars
   const direction = 'ltr'
-  const mode = await getMode()
-  const systemMode = await getSystemMode()
+  const { mode, settingsCookie, systemMode } = await getThemeCookieState()
 
   return (
-    <Providers direction={direction}>
+    <Providers
+      direction={direction}
+      mode={mode}
+      settingsCookie={settingsCookie}
+      systemMode={systemMode}
+    >
       <LayoutWrapper
         systemMode={systemMode}
         verticalLayout={

@@ -32,6 +32,7 @@ const resolveHeaderSolid = color => {
 
 const buildSurfacePaintVars = (vars, prefix, solidColor, gradientSetting) => {
   const layers = resolveSurfaceLayers(solidColor, gradientSetting)
+
   const contrastColor =
     gradientSetting?.to && solidColor
       ? getContrastColorForGradient(solidColor, gradientSetting.to)
@@ -55,7 +56,7 @@ const buildSurfaceContrastVars = (vars, prefix, bg) => {
   })
 }
 
-const OPTIONAL_ROOT_CSS_VARS = ['--theme-card-border', '--header-bg-solid']
+const OPTIONAL_ROOT_CSS_VARS = ['--theme-card-border', '--header-bg-solid', '--theme-body-bg-image']
 
 const resolveContrastAttribute = color => {
   if (!color || isTransparentSurface(color)) return null
@@ -74,8 +75,10 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
   const sidebarSolid = resolveThemeSurface(normalized.themeSidebarBg, normalized.themePreset, 'sidebar')
   const cardBorder = resolveThemeSurface(normalized.themeCardBorder, normalized.themePreset, 'cardBorder')
   const modeDefaults = getDefaultThemeSettingsForMode(effectiveMode)
+
   const fallbackBody =
     modeDefaults.themeBodyBg === 'default' ? FALLBACK_LIGHT_BODY : modeDefaults.themeBodyBg
+
   const bodySolid = bodySolidRaw ?? fallbackBody
 
   const bodySurface = buildSurfacePaintVars(
@@ -84,12 +87,14 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
     bodySolid,
     normalized.themeBodyBgGradient
   )
+
   const paperSurface = buildSurfacePaintVars(
     cssVars,
     'paper',
     paperSolid,
     normalized.themePaperBgGradient
   )
+
   const sidebarSurface = buildSurfacePaintVars(
     cssVars,
     'sidebar',

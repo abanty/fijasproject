@@ -1,20 +1,38 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
 import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
-import HorizontalWithSubtitle from '@components/card-statistics/HorizontalWithSubtitle'
 import MatchOfTheDay from '@/components/matches/MatchOfTheDay'
+import { DashboardPageLoading } from '@/components/loading/PageLoading'
 import PredictionCard from '@/components/predictions/PredictionCard'
 import { useCompactDensity } from '@core/hooks/useCompactDensity'
 import UpgradeBanner from '@/components/subscription/UpgradeBanner'
+import { getTodayPredictions } from '@/services/predictionsService'
 
-const DashboardView = ({ data }) => {
+const DashboardView = () => {
   const compact = useCompactDensity()
+  const [data, setData] = useState(null)
+
+  useEffect(() => {
+    let active = true
+
+    getTodayPredictions().then(result => {
+      if (active) setData(result)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  if (!data) {
+    return <DashboardPageLoading />
+  }
+
   const unlocked = data.items.filter(item => !item.isLocked)
-  const lockedCount = data.items.length - unlocked.length
-  const noBetCount = data.items.filter(item => item.analysis?.confidence === 'NO_BET').length
   const topPrediction = unlocked[0]
 
   return (
@@ -39,49 +57,6 @@ const DashboardView = ({ data }) => {
           <MatchOfTheDay match={topPrediction} />
         </div>
       ) : null}
-
-      <Grid container spacing={compact ? 3 : 4}>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HorizontalWithSubtitle
-            title='Partidos del dia'
-            stats={String(data.items.length)}
-            avatarIcon='ri-football-line'
-            avatarColor='primary'
-            subtitle='Publicados para hoy'
-            avatarSize={compact ? 36 : 42}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HorizontalWithSubtitle
-            title='Desbloqueados'
-            stats={String(unlocked.length)}
-            avatarIcon='ri-lock-unlock-line'
-            avatarColor='success'
-            subtitle='Visibles en plan gratuito'
-            avatarSize={compact ? 36 : 42}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HorizontalWithSubtitle
-            title='Bloqueados'
-            stats={String(lockedCount)}
-            avatarIcon='ri-lock-line'
-            avatarColor='warning'
-            subtitle='Requieren Premium'
-            avatarSize={compact ? 36 : 42}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
-          <HorizontalWithSubtitle
-            title='NO BET'
-            stats={String(noBetCount)}
-            avatarIcon='ri-forbid-line'
-            avatarColor='error'
-            subtitle='Sin valor claro hoy'
-            avatarSize={compact ? 36 : 42}
-          />
-        </Grid>
-      </Grid>
 
       {topPrediction ? (
         <div className='flex flex-col gap-4'>

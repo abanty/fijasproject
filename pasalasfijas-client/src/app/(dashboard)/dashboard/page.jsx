@@ -1,8 +1,5 @@
-import DashboardView from '@/views/dashboard'
-import { getTodayPredictions } from '@/services/predictionsService'
+import DashboardDynamicMount from './DashboardDynamicMount'
 
-export default async function DashboardPage() {
-  const data = await getTodayPredictions()
-
-  return <DashboardView data={data} />
+export default function DashboardPage() {
+  return <DashboardDynamicMount />
 }

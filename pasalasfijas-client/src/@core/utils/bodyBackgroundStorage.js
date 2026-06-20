@@ -1,5 +1,7 @@
 const STORAGE_KEY = 'pasame-la-fija-body-bg-image'
 
+export const BODY_BG_IMAGE_STORAGE_KEY = STORAGE_KEY
+
 export const getBodyBackgroundImage = () => {
   if (typeof window === 'undefined') return null
 

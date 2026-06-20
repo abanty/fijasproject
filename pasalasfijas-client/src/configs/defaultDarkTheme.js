@@ -1,49 +1,37 @@
-export const DEFAULT_DARK_WALLPAPER = '/images/illustrations/wallpapers/scren.jpg'
-
 /** Tema dark por defecto de Pasame La Fija (exportable desde Customizer). */
 const defaultDarkTheme = {
   version: 1,
   app: 'pasame-la-fija',
   template: 'Las fijas',
-  name: 'nuevo tema dark',
+  name: 'tftgdgd',
   settings: {
-    mode: 'dark',
-    skin: 'default',
-    semiDark: false,
-    layout: 'horizontal',
-    navbarContentWidth: 'compact',
-    contentWidth: 'compact',
-    footerContentWidth: 'compact',
-    primaryColor: '#2092EC',
-    themePreset: 'default',
-    componentDensity: 'compact',
+    mode: 'dark', // light | dark | system
+    skin: 'default', // default | bordered (bordes visibles en cards)
+    semiDark: false, // sidebar oscuro con contenido claro
+    layout: 'horizontal', // horizontal | vertical | collapsed
+    navbarContentWidth: 'compact', // ancho barra nav: compact | wide
+    contentWidth: 'compact', // ancho zona principal
+    footerContentWidth: 'compact', // ancho footer
+    primaryColor: '#04c96c', // botones, tabs activas, menú seleccionado
+    themePreset: 'default', // preset de paleta (default, world-cup, …)
+    componentDensity: 'default', // compact = inputs/chips más pequeños
     fontFamily: 'roboto',
-    bodyShellWidth: 'boxed',
-    rightPanelEnabled: true,
-    themeBodyBg: '#070f13',
-    themeBodyBgImageEnabled: true,
-    themeBodyBgGradient: null,
-    themePaperBg: '#060709',
-    themePaperBgGradient: {
-      to: '#10131e',
-      angle: 90
-    },
-    themeSidebarBg: 'transparent',
+    bodyShellWidth: 'boxed', // boxed = contenido centrado con max-width | full
+    rightPanelEnabled: true, // panel derecho (nav lateral extra)
+    themeBodyBg: '#0a0d19', // fondo app; color base del linear-gradient(from, to, angle)
+    themeBodyBgImageEnabled: false, // imagen custom encima del fondo
+    themeBodyBgGradient: { to: '#090a0d', angle: 180 }, // to = color final; angle = grados CSS
+    themePaperBg: '#060709', // cards, modales y paneles (MuiPaper / MuiCard)
+    themePaperBgGradient: { to: '#10131e', angle: 90 },
+    themeSidebarBg: 'transparent', // transparent = deja ver el fondo body
     themeSidebarBgImageEnabled: false,
-    themeSidebarBgGradient: null,
-    themeCardBorder: 'default',
-    headerBgColor: '#07080d',
+    themeSidebarBgGradient: null, // null = sin gradiente
+    themeCardBorder: 'default', // borde de cards; default = según skin/preset
+    headerBgColor: '#07080d', // header / barra superior con tabs
     headerBgImageEnabled: false,
-    headerBgGradient: {
-      to: '#07090e',
-      angle: 180
-    }
+    headerBgGradient: { to: '#07090e', angle: 180 }
   },
-  images: {
-    body: DEFAULT_DARK_WALLPAPER,
-    header: null,
-    sidebar: null
-  }
+  images: { body: null, header: null, sidebar: null } // null = ninguna; al importar van a localStorage
 }
 
 export const defaultDarkThemeSettings = defaultDarkTheme.settings

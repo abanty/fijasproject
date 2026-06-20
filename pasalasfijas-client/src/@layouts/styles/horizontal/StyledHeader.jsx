@@ -38,7 +38,7 @@ const StyledHeader = styled.header`
   .${horizontalLayoutClasses.navbar} {
     position: relative;
     min-block-size: var(--header-top-height, var(--header-height));
-    padding-block: var(--header-padding-block, 8px);
+    padding-block: var(--header-padding-block, 4px);
     padding-inline: var(--layout-padding);
   }
 

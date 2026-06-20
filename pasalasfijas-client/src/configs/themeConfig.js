@@ -7,7 +7,7 @@ import { defaultLightThemeSettings } from './defaultLightTheme'
  * reset en Customizer o borra "materio-mui-next-demo" en Application/Storage.
  */
 const themeConfig = {
-  templateName: 'Las fijas',
+  templateName: 'PasalasFijas',
   homePageUrl: '/dashboard',
   settingsCookieName: 'materio-mui-next-demo',
   defaultLightTheme: defaultLightThemeSettings,

@@ -18,7 +18,7 @@ const FontFamilySync = () => {
 
     root.dataset.fontFamily = fontFamilyId
     root.style.setProperty('--app-font-family', stack)
-  }, [settings.fontFamily])
+  }, [settings])
 
   return null
 }

@@ -1,5 +1,9 @@
 // Next Imports
+import { cache } from 'react'
+
 import { cookies } from 'next/headers'
+
+// React Imports
 
 // Third-party Imports
 import 'server-only'
@@ -7,33 +11,40 @@ import 'server-only'
 // Config Imports
 import themeConfig from '@configs/themeConfig'
 
-export const getSettingsFromCookie = async () => {
+/**
+ * Una sola lectura de `cookies()` por petición RSC (layout raíz + segmento + Providers).
+ */
+export const getThemeCookieState = cache(async () => {
   const cookieStore = await cookies()
   const cookieName = themeConfig.settingsCookieName
+  const settingsCookie = JSON.parse(cookieStore.get(cookieName)?.value || '{}')
+  const mode = settingsCookie.mode || themeConfig.mode
+  const colorPrefCookie = cookieStore.get('colorPref')?.value || 'light'
+  const systemMode = (mode === 'system' ? colorPrefCookie : mode) || 'light'
 
-  return JSON.parse(cookieStore.get(cookieName)?.value || '{}')
+  return { settingsCookie, mode, systemMode }
+})
+
+export const getSettingsFromCookie = async () => {
+  const { settingsCookie } = await getThemeCookieState()
+
+  return settingsCookie
 }
 
 export const getMode = async () => {
-  const settingsCookie = await getSettingsFromCookie()
+  const { mode } = await getThemeCookieState()
 
-  // Get mode from cookie or fallback to theme config
-  const _mode = settingsCookie.mode || themeConfig.mode
-
-  return _mode
+  return mode
 }
 
 export const getSystemMode = async () => {
-  const cookieStore = await cookies()
-  const mode = await getMode()
-  const colorPrefCookie = cookieStore.get('colorPref')?.value || 'light'
+  const { systemMode } = await getThemeCookieState()
 
-  return (mode === 'system' ? colorPrefCookie : mode) || 'light'
+  return systemMode
 }
 
 export const getServerMode = async () => {
-  const mode = await getMode()
-  const systemMode = await getSystemMode()
+  const { mode, systemMode } = await getThemeCookieState()
 
   return mode === 'system' ? systemMode : mode
 }

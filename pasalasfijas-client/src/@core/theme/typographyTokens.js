@@ -7,7 +7,7 @@ const captionSidebarByDensity = {
     textTransform: 'uppercase'
   },
   default: {
-    fontSize: '0.875rem',
+    fontSize: '0.840rem',
     lineHeight: 1.4,
     letterSpacing: '0.05em',
     fontWeight: 700,

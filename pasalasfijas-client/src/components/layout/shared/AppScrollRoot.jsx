@@ -40,7 +40,9 @@ export const useAppScrollTrigger = ({ threshold = 0, disableHysteresis = true } 
 
     if (!bind()) {
       const rafId = requestAnimationFrame(() => bind())
-      return () => {
+
+      
+return () => {
         cancelAnimationFrame(rafId)
         cleanup?.()
       }

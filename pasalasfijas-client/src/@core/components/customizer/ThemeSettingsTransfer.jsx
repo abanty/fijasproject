@@ -24,6 +24,7 @@ const ThemeSettingsTransfer = () => {
   const handleExport = () => {
     const name = window.prompt('Nombre del tema (opcional):', '') ?? ''
     const payload = buildThemeExport(settings, { name })
+
     downloadThemeExport(payload, name)
   }
 

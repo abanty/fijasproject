@@ -115,6 +115,7 @@ export const GenerateHorizontalMenu = ({ menuData }) => {
       const menuItemSuffix = suffix && suffix.label ? <Chip size='small' {...suffix} /> : suffix
       const highlightText = highlight?.badge ?? highlight?.label
       const ariaLabel = highlightText ? `${label}, ${highlightText}` : undefined
+
       const menuContent =
         highlight?.badge || highlight?.label ? (
           <NavItemBadge highlight={highlight}>

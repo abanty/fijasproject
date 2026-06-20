@@ -15,7 +15,7 @@
   --header-navbar-height: 52px;
   --header-top-height: 52px;
   --header-nav-height: 44px;
-  --header-padding-block: 6px;
+  --header-padding-block: 4px;
   --header-sticky-offset: 10px;
   --layout-padding: 20px;
   --body-shell-max-width: 1440px;
@@ -29,7 +29,7 @@
   --card-content-gap: 0.75rem;
   --nav-highlight-badge-anchor-padding-block-start: 4px;
   --nav-highlight-badge-anchor-padding-inline-end: 10px;
-  --nav-highlight-badge-band-padding-block-start: 4px;
+  --nav-highlight-badge-band-padding-block-start: 0px;
   --header-actions-reserve: 5.5rem;
   --sidebar-bg: var(--mui-palette-background-paper);
   --app-sidebar-nav-scroll-padding-inline-end: 0;
@@ -53,9 +53,9 @@
   --header-navbar-height: 56px;
   --header-top-height: 56px;
   --header-nav-height: 48px;
-  --header-padding-block: 8px;
+  --header-padding-block: 4px;
   --header-sticky-offset: 10px;
-  --layout-padding: 24px;
+  --layout-padding: 20px;
   --typography-caption-sidebar-size: 0.875rem;
   --typography-caption-sidebar-line-height: 1.4;
   --typography-caption-sidebar-letter-spacing: 0.05em;
@@ -101,30 +101,11 @@ body {
 }
 
 [data-body-bg-image='on'] body {
-  background-image: var(--theme-body-bg-gradient-layer, none);
-}
-
-[data-body-bg-image='on']::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-color: var(--theme-body-bg-solid, var(--theme-body-bg, var(--mui-palette-background-default)));
-  background-image: var(--theme-body-bg-image);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(24px);
-  transform: scale(1.06);
-  transition:
-    filter 0.4s ease,
-    transform 0.4s ease;
-}
-
-[data-body-bg-image='on'][data-body-bg-image-state='ready']::before {
-  filter: blur(0);
-  transform: scale(1);
+  background-image: var(--theme-body-bg-image), var(--theme-body-bg-gradient-layer, none);
+  background-size: cover, auto;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-attachment: fixed, fixed;
 }
 
 [data-theme-preset='world-cup'][data-dark][data-skin='bordered'] .MuiPaper-root:not(.MuiAlert-root),

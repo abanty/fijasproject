@@ -73,6 +73,7 @@ export const formatMatchDayTime = kickoffAt => {
   const date = new Date(kickoffAt)
   const today = new Date()
   const isToday = date.toDateString() === today.toDateString()
+
   const time = new Intl.DateTimeFormat('es-PE', {
     hour: '2-digit',
     minute: '2-digit'

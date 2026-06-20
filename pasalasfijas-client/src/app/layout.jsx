@@ -1,5 +1,6 @@
 // Third-party Imports
 import 'react-perfect-scrollbar/dist/css/styles.css'
+import 'animate.css/animate.min.css'
 
 // Component Imports
 import ColorSchemeInitScript from '@components/theme/ColorSchemeInitScript'
@@ -8,7 +9,7 @@ import ColorSchemeInitScript from '@components/theme/ColorSchemeInitScript'
 import { fontFamilyVariableClassNames } from '@configs/appFonts'
 
 // Util Imports
-import { getSettingsFromCookie, getSystemMode } from '@core/utils/serverHelpers'
+import { getThemeCookieState } from '@core/utils/serverHelpers'
 import { resolveThemeRootSnapshot } from '@/lib/theme/resolveThemeRootSnapshot'
 
 // Style Imports
@@ -25,12 +26,13 @@ export const metadata = {
 const RootLayout = async props => {
   const { children } = props
 
-  const systemMode = await getSystemMode()
-  const settingsCookie = await getSettingsFromCookie()
+  const { settingsCookie, systemMode } = await getThemeCookieState()
   const themeRoot = resolveThemeRootSnapshot(settingsCookie, systemMode)
+
   const htmlDataAttributes = Object.fromEntries(
     Object.entries(themeRoot.dataAttributes).filter(([, value]) => value != null)
   )
+
   const direction = 'ltr'
 
   return (

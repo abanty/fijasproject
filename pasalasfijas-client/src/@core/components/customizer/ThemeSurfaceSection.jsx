@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 // MUI Imports
 import Accordion from '@mui/material/Accordion'
@@ -92,13 +92,14 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
   const { updateSettings } = useSettings()
   const [pickerField, setPickerField] = useState(null)
   const pickerAnchorRef = useRef(null)
+
   const [imageUrls, setImageUrls] = useState({
     body: null,
     header: null,
     sidebar: null
   })
 
-  const syncImageUrls = () => {
+  const syncImageUrls = useCallback(() => {
     const effectiveMode = settings.mode === 'dark' ? 'dark' : 'light'
     const defaultImages = getDefaultThemeImagesForMode(effectiveMode)
     const storedBody = getBodyBackgroundImage()
@@ -110,7 +111,12 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
       header: storedHeader ?? (settings.headerBgImageEnabled ? defaultImages.header : null),
       sidebar: storedSidebar ?? (settings.themeSidebarBgImageEnabled ? defaultImages.sidebar : null)
     })
-  }
+  }, [
+    settings.mode,
+    settings.themeBodyBgImageEnabled,
+    settings.headerBgImageEnabled,
+    settings.themeSidebarBgImageEnabled
+  ])
 
   useEffect(() => {
     syncImageUrls()
@@ -124,7 +130,7 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
       window.removeEventListener(HEADER_BG_IMAGE_CHANGED, syncImageUrls)
       window.removeEventListener(SIDEBAR_BG_IMAGE_CHANGED, syncImageUrls)
     }
-  }, [settings.mode, settings.themeBodyBgImageEnabled, settings.headerBgImageEnabled, settings.themeSidebarBgImageEnabled])
+  }, [syncImageUrls])
 
   const hasBodyImage = settings.themeBodyBgImageEnabled && imageUrls.body
   const hasHeaderImage = settings.headerBgImageEnabled && imageUrls.header
@@ -552,6 +558,7 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
         const gradient = getGradientSetting(field)
         const previewPaint = resolveSurfacePaint(resolvedPreview, gradient)
         const currentLabel = gradient?.to ? 'Gradiente' : getFieldSwatchLabel(field, kind)
+
         const accordionPreviewStyle = getSurfacePreviewStyle(
           isTransparentSurface(resolvedPreview) && !gradient?.to ? 'transparent' : previewPaint ?? resolvedPreview,
           { checkerSize: '6px' }
@@ -637,6 +644,7 @@ const ThemeSurfaceSection = ({ settings, onChange, styles }) => {
           const pickerKind = themeSurfaceFields.find(item => item.field === basePickerField)?.kind
           const gradientField = getSurfaceGradientField(basePickerField)
           const gradientSetting = gradientField ? settings[gradientField] : null
+
           const pickerColor = isGradientToPicker
             ? (gradientSetting?.to ?? getFieldPreviewColor(basePickerField, pickerKind) ?? '#8C57FF')
             : getPickerDefaultColor(basePickerField, pickerKind)

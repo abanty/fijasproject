@@ -1,8 +1,5 @@
-import PredictionsView from '@/views/predictions'
-import { getTodayPredictions } from '@/services/predictionsService'
+import PredictionsDynamicMount from './PredictionsDynamicMount'
 
-export default async function PredictionsPage() {
-  const data = await getTodayPredictions()
-
-  return <PredictionsView data={data} />
+export default function PredictionsPage() {
+  return <PredictionsDynamicMount />
 }

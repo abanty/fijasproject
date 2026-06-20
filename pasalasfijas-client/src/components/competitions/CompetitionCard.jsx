@@ -13,6 +13,7 @@ import RemixIcon from '@components/shared/RemixIcon'
 
 const CompetitionCard = ({ competition, matchCount }) => {
   const href = `/matches/${competition.slug}`
+
   const countLabel =
     competition.matchCountLabel ??
     (typeof matchCount === 'number' && matchCount > 0 ? `${matchCount} partidos` : null)

@@ -17,7 +17,7 @@ const ThemePresetSync = () => {
 
     document.documentElement.dataset.themePreset = normalized.themePreset ?? 'default'
     document.documentElement.dataset.density = normalized.componentDensity ?? 'compact'
-  }, [settings.themePreset, settings.componentDensity])
+  }, [settings])
 
   return null
 }

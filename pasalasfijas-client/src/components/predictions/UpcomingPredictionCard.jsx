@@ -83,7 +83,7 @@ const UpcomingPredictionCard = ({ prediction }) => {
       <CardContent className={classnames('upcoming-prediction-card__content match-of-day-body')}>
         <div className='match-of-day-watermark' aria-hidden />
 
-        <div className='p-4 flex flex-col gap-3'>
+        <div className='p-2 flex flex-col gap-3'>
           <div className='upcoming-prediction-card__toolbar relative z-[1] flex items-start justify-between gap-2'>
             <div className='flex flex-wrap items-center gap-2 min-is-0'>
               <Chip
