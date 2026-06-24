@@ -18,7 +18,7 @@ import { AuthController } from './presentation/controllers/auth.controller'
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') ?? 'change_me',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') ?? '7d',
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ?? '7d') as `${number}${'s' | 'm' | 'h' | 'd'}`,
         },
       }),
     }),

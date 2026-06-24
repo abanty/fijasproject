@@ -6,41 +6,94 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Divider from '@mui/material/Divider'
+import { Controller } from 'react-hook-form'
 
 import Link from '@components/Link'
 
 import { useSignUp } from '../../hooks/useSignUp'
 
 const SignUpForm = () => {
-  const { isPasswordShown, handleClickShowPassword, handleSubmit } = useSignUp()
+  const { control, errors, isPasswordShown, formError, loading, handleClickShowPassword, handleSubmit } = useSignUp()
 
   return (
     <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
-      <TextField autoFocus fullWidth size='medium' label='Nombre' />
-      <TextField fullWidth size='medium' label='Email' />
-      <TextField
-        fullWidth
-        size='medium'
-        label='Password'
-        type={isPasswordShown ? 'text' : 'password'}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position='end'>
-                <IconButton
-                  size='small'
-                  edge='end'
-                  onClick={handleClickShowPassword}
-                  onMouseDown={e => e.preventDefault()}
-                >
-                  <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                </IconButton>
-              </InputAdornment>
-            )
+      <Controller
+        name='name'
+        control={control}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            autoFocus
+            fullWidth
+            size='medium'
+            label='Nombre'
+            disabled={loading}
+            {...(errors.name && { error: true, helperText: errors.name.message })}
+          />
+        )}
+      />
+      <Controller
+        name='email'
+        control={control}
+        rules={{
+          required: 'El email es requerido',
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: 'Ingresa un email válido'
           }
         }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            fullWidth
+            size='medium'
+            label='Email'
+            type='email'
+            disabled={loading}
+            {...(errors.email && { error: true, helperText: errors.email.message })}
+          />
+        )}
+      />
+      <Controller
+        name='password'
+        control={control}
+        rules={{
+          required: 'La contraseña es requerida',
+          minLength: {
+            value: 8,
+            message: 'La contraseña debe tener al menos 8 caracteres'
+          }
+        }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            fullWidth
+            size='medium'
+            label='Contraseña'
+            type={isPasswordShown ? 'text' : 'password'}
+            disabled={loading}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      edge='end'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={e => e.preventDefault()}
+                    >
+                      <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            }}
+            {...(errors.password && { error: true, helperText: errors.password.message })}
+          />
+        )}
       />
       <FormControlLabel
         control={<Checkbox />}
@@ -53,13 +106,25 @@ const SignUpForm = () => {
           </>
         }
       />
-      <Button fullWidth variant='contained' type='submit' size='medium'>
-        Crear cuenta
+      {formError ? (
+        <Typography color='error' variant='body2'>
+          {formError}
+        </Typography>
+      ) : null}
+      <Button
+        fullWidth
+        variant='contained'
+        type='submit'
+        size='medium'
+        disabled={loading}
+        startIcon={loading ? <CircularProgress color='inherit' size={18} thickness={5} /> : null}
+      >
+        {loading ? 'Creando cuenta…' : 'Crear cuenta'}
       </Button>
       <div className='flex justify-center items-center flex-wrap gap-2'>
         <Typography>Ya tienes cuenta?</Typography>
         <Typography component={Link} href='/login' color='primary.main'>
-          Inicia sesion
+          Inicia sesión
         </Typography>
       </div>
       <Divider className='gap-3'>o</Divider>

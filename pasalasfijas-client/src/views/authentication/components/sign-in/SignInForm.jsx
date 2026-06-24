@@ -6,49 +6,90 @@ import IconButton from '@mui/material/IconButton'
 import InputAdornment from '@mui/material/InputAdornment'
 import Checkbox from '@mui/material/Checkbox'
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import Divider from '@mui/material/Divider'
+import { Controller } from 'react-hook-form'
 
 import Link from '@components/Link'
 
 import { useSignIn } from '../../hooks/useSignIn'
 
 const SignInForm = () => {
-  const { isPasswordShown, handleClickShowPassword, handleSubmit } = useSignIn()
+  const { control, errors, isPasswordShown, loading, handleClickShowPassword, handleSubmit } = useSignIn()
 
   return (
     <form noValidate autoComplete='off' onSubmit={handleSubmit} className='flex flex-col gap-5'>
-      <TextField autoFocus fullWidth size='medium' label='Email' />
-      <TextField
-        fullWidth
-        size='medium'
-        label='Password'
-        type={isPasswordShown ? 'text' : 'password'}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position='end'>
-                <IconButton
-                  size='small'
-                  edge='end'
-                  onClick={handleClickShowPassword}
-                  onMouseDown={e => e.preventDefault()}
-                >
-                  <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
-                </IconButton>
-              </InputAdornment>
-            )
+      <Controller
+        name='email'
+        control={control}
+        rules={{
+          required: 'El email es requerido',
+          pattern: {
+            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            message: 'Ingresa un email válido'
           }
         }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            autoFocus
+            fullWidth
+            size='medium'
+            label='Email'
+            type='email'
+            disabled={loading}
+            {...(errors.email && { error: true, helperText: errors.email.message })}
+          />
+        )}
+      />
+      <Controller
+        name='password'
+        control={control}
+        rules={{ required: 'La contraseña es requerida' }}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            fullWidth
+            size='medium'
+            label='Contraseña'
+            type={isPasswordShown ? 'text' : 'password'}
+            disabled={loading}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton
+                      size='small'
+                      edge='end'
+                      onClick={handleClickShowPassword}
+                      onMouseDown={e => e.preventDefault()}
+                    >
+                      <i className={isPasswordShown ? 'ri-eye-off-line' : 'ri-eye-line'} />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }
+            }}
+            {...(errors.password && { error: true, helperText: errors.password.message })}
+          />
+        )}
       />
       <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
         <FormControlLabel control={<Checkbox />} label='Recordarme' />
         <Typography className='text-end' color='primary.main' component={Link}>
-          Olvidaste tu contrasena?
+          Olvidaste tu contraseña?
         </Typography>
       </div>
-      <Button fullWidth variant='contained' type='submit' size='medium'>
-        Ingresar
+      <Button
+        fullWidth
+        variant='contained'
+        type='submit'
+        size='medium'
+        disabled={loading}
+        startIcon={loading ? <CircularProgress color='inherit' size={18} thickness={5} /> : null}
+      >
+        {loading ? 'Ingresando…' : 'Ingresar'}
       </Button>
       <div className='flex justify-center items-center flex-wrap gap-2'>
         <Typography>Nuevo en las fijas?</Typography>

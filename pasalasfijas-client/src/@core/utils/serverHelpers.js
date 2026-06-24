@@ -20,7 +20,7 @@ export const getThemeCookieState = cache(async () => {
   const settingsCookie = JSON.parse(cookieStore.get(cookieName)?.value || '{}')
   const mode = settingsCookie.mode || themeConfig.mode
   const colorPrefCookie = cookieStore.get('colorPref')?.value || 'light'
-  const systemMode = (mode === 'system' ? colorPrefCookie : mode) || 'light'
+  const systemMode = (mode === 'system' ? colorPrefCookie : mode) || themeConfig.mode || 'dark'
 
   return { settingsCookie, mode, systemMode }
 })

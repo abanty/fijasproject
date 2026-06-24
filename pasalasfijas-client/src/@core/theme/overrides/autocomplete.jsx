@@ -11,8 +11,10 @@ const autocomplete = skin => ({
           }
         }
       }),
-      ChipProps: {
-        size: 'small'
+      slotProps: {
+        chip: {
+          size: 'small'
+        }
       },
       popupIcon: <i className='ri-arrow-down-s-line' />
     },

@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import PlanDetails from './PlanDetails'
 import DirectionalIcon from '@components/DirectionalIcon'
 
-const Pricing = ({ data }) => {
+const Pricing = ({ data, onUpgrade, upgrading = false, error = '' }) => {
   const [pricingPlan, setPricingPlan] = useState('annually')
   const theme = useTheme()
   const columnSize = data?.length === 2 ? 6 : 4
@@ -34,6 +34,11 @@ const Pricing = ({ data }) => {
         <div className='flex items-center text-center flex-col mbe-[2.8rem]'>
           <Typography>Empieza gratis y desbloquea mas analisis cuando lo necesites.</Typography>
           <Typography>Elige el plan que mejor se adapte a tu seguimiento diario.</Typography>
+          {error ? (
+            <Typography variant='body2' color='error' className='mts-2'>
+              {error}
+            </Typography>
+          ) : null}
         </div>
         <div className='flex justify-center items-center relative mbs-0.5'>
           <InputLabel htmlFor='pricing-switch' className='cursor-pointer text-textSecondary'>
@@ -62,7 +67,12 @@ const Pricing = ({ data }) => {
       <Grid container spacing={6}>
         {data?.map((plan, index) => (
           <Grid size={{ xs: 12, md: columnSize }} key={index}>
-            <PlanDetails data={plan} pricingPlan={pricingPlan} />
+            <PlanDetails
+              data={plan}
+              pricingPlan={pricingPlan}
+              onUpgrade={onUpgrade}
+              upgrading={upgrading}
+            />
           </Grid>
         ))}
       </Grid>

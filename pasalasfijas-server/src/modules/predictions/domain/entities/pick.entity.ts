@@ -1,9 +1,9 @@
 import { ConfidenceLevel, PickMarket, PickResultStatus, PickType } from '@prisma/client'
 
 export class PickEntity {
-  id!: string
-  analysisId!: string
-  matchId!: string
+  id!: number
+  analysisId!: number
+  matchId!: number
   market!: PickMarket
   selection!: string
   pickType!: PickType

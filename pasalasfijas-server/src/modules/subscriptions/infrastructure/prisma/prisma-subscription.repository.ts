@@ -7,7 +7,7 @@ import { ActiveSubscription, SubscriptionRepository } from '../../domain/reposit
 export class PrismaSubscriptionRepository implements SubscriptionRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findActiveByUserId(userId: string): Promise<ActiveSubscription | null> {
+  findActiveByUserId(userId: number): Promise<ActiveSubscription | null> {
     return this.prisma.subscription.findFirst({
       where: {
         userId,
@@ -16,6 +16,26 @@ export class PrismaSubscriptionRepository implements SubscriptionRepository {
       },
       include: { plan: true },
       orderBy: { startedAt: 'desc' },
+    })
+  }
+
+  async upgradeUserPlan(userId: number, planId: number): Promise<ActiveSubscription> {
+    await this.prisma.subscription.updateMany({
+      where: {
+        userId,
+        status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING] },
+      },
+      data: { status: SubscriptionStatus.CANCELLED },
+    })
+
+    return this.prisma.subscription.create({
+      data: {
+        userId,
+        planId,
+        status: SubscriptionStatus.ACTIVE,
+        provider: 'mock',
+      },
+      include: { plan: true },
     })
   }
 }

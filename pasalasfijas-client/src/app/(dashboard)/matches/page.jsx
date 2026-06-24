@@ -1,9 +1,5 @@
-import CompetitionsView from '@/views/competitions'
-import { getCompetitionMatchCounts, getCompetitions } from '@/services/competitionsService'
+import MatchesDynamicMount from './MatchesDynamicMount'
 
-export default async function MatchesPage() {
-  const competitions = getCompetitions()
-  const matchCounts = await getCompetitionMatchCounts()
-
-  return <CompetitionsView competitions={competitions} matchCounts={matchCounts} />
+export default function MatchesPage() {
+  return <MatchesDynamicMount />
 }

@@ -10,7 +10,9 @@ export const getTodayPredictions = async () => {
 }
 
 export const getPredictionHistory = async () => {
-  if (shouldUseMock()) return mockPredictionHistory
+  if (shouldUseMock()) {
+    return { locked: false, items: mockPredictionHistory }
+  }
 
   return apiClient('/predictions/history')
 }

@@ -1,5 +1,7 @@
 # Next Steps
 
+> **Datos deportivos / Mundial 2026:** ver [PENDIENTE-DATOS-DEPORTIVOS.md](./PENDIENTE-DATOS-DEPORTIVOS.md) (proveedores, sync, tareas para retomar).
+
 ## Step 1 - Validate base
 
 Run:

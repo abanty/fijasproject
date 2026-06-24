@@ -10,9 +10,8 @@ import Logo from '@components/layout/shared/Logo'
 import ModeDropdown from '@components/layout/shared/ModeDropdown'
 import UserDropdown from '@components/layout/shared/UserDropdown'
 
-// Third-party Imports
-
-// Hook Imports
+// Config Imports
+import themeConfig from '@configs/themeConfig'
 import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 // Util Imports
@@ -31,7 +30,7 @@ const NavbarContent = () => {
       <div className='relative z-[1] flex items-center gap-4 shrink-0'>
         <NavToggle />
         {!isBreakpointReached && (
-          <Link href='/dashboard' className='flex items-center'>
+          <Link href={themeConfig.homePageUrl} className='flex items-center'>
             <Logo />
           </Link>
         )}

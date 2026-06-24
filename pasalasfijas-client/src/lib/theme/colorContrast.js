@@ -85,3 +85,14 @@ export const hexToRgbChannels = color => {
 
   return `${rgb.r} ${rgb.g} ${rgb.b}`
 }
+
+/** Tono del drawer customizer: ligeramente más oscuro que paper (se distingue del header). */
+export const liftSurfaceTone = (color, mode = 'dark') => {
+  if (!color || color === 'transparent') return null
+
+  if (mode === 'dark') {
+    return `color-mix(in srgb, ${color} 82%, black 18%)`
+  }
+
+  return `color-mix(in srgb, ${color} 90%, black 10%)`
+}

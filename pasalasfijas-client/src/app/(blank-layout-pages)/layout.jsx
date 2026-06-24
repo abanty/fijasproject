@@ -1,5 +1,6 @@
 // Component Imports
 import Providers from '@components/Providers'
+import GuestAuthShell from '@components/auth/GuestAuthShell'
 import BlankLayout from '@layouts/BlankLayout'
 
 // Util Imports
@@ -18,7 +19,9 @@ const Layout = async props => {
       settingsCookie={settingsCookie}
       systemMode={systemMode}
     >
-      <BlankLayout systemMode={systemMode}>{children}</BlankLayout>
+      <BlankLayout systemMode={systemMode}>
+        <GuestAuthShell>{children}</GuestAuthShell>
+      </BlankLayout>
     </Providers>
   )
 }

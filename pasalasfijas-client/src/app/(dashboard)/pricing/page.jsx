@@ -1,6 +1,5 @@
-import PricingView from '@/views/pricing'
-import { mockPricingPlans } from '@/data/mock/pricing'
+import PricingDynamicMount from './PricingDynamicMount'
 
 export default function PricingPage() {
-  return <PricingView data={mockPricingPlans} />
+  return <PricingDynamicMount />
 }

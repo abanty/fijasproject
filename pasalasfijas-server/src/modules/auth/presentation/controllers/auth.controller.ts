@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common'
-import { CurrentUser, CurrentUserPayload } from '../../../../shared/security/current-user.decorator'
+import { CurrentUser, type CurrentUserPayload } from '../../../../shared/security/current-user.decorator'
 import { LoginUserUseCase } from '../../application/use-cases/login-user.use-case'
 import { RegisterUserUseCase } from '../../application/use-cases/register-user.use-case'
 import { JwtAuthGuard } from '../guards/jwt-auth.guard'

@@ -28,15 +28,22 @@ import RemixIcon from '@components/shared/RemixIcon'
 import { useSidebarNav } from '@/contexts/sidebarNavContext'
 
 // Data Imports
-import sidebarMenuData from '@/data/navigation/sidebarMenuData'
+import { getSidebarMenuData } from '@/data/navigation/navigationCatalog'
+
+// Hook Imports
+import { useCurrentUser } from '@/hooks/useCurrentUser'
 
 // Util Imports
 import { isSidebarNavActive } from '@/lib/navigation/isNavActive'
 
+const isAdminRole = role => role === 'ADMIN' || role === 'SUPER_ADMIN'
+
 const SidebarNavContent = ({ onNavigate }) => {
   const pathname = usePathname()
   const [query, setQuery] = useState('')
-  const sections = useMemo(() => sidebarMenuData(), [])
+  const { user } = useCurrentUser()
+  const isAdmin = isAdminRole(user?.role)
+  const sections = useMemo(() => getSidebarMenuData({ isAdmin }), [isAdmin])
 
   const filteredSections = useMemo(() => {
     const normalized = query.trim().toLowerCase()

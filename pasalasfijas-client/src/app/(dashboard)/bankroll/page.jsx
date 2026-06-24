@@ -1,8 +1,5 @@
-import BankrollView from '@/views/bankroll'
-import { getBankrollSummary } from '@/services/bankrollService'
+import BankrollDynamicMount from './BankrollDynamicMount'
 
-export default async function BankrollPage() {
-  const bankroll = await getBankrollSummary()
-
-  return <BankrollView bankroll={bankroll} />
+export default function BankrollPage() {
+  return <BankrollDynamicMount />
 }

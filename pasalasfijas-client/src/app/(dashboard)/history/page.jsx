@@ -1,8 +1,5 @@
-import HistoryView from '@/views/history'
-import { getPredictionHistory } from '@/services/predictionsService'
+import HistoryDynamicMount from './HistoryDynamicMount'
 
-export default async function HistoryPage() {
-  const history = await getPredictionHistory()
-
-  return <HistoryView history={history} />
+export default function HistoryPage() {
+  return <HistoryDynamicMount />
 }

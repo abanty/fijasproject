@@ -1,16 +1,11 @@
-import { notFound } from 'next/navigation'
-
+import CompetitionDetailDynamicMount from './CompetitionDetailDynamicMount'
 import { getCompetitionBySlug } from '@/data/competitions/catalog'
-import CompetitionDetailView from '@/views/competitions/CompetitionDetailView'
-import { getCompetitionMatches } from '@/services/competitionsService'
+import { notFound } from 'next/navigation'
 
 export default async function CompetitionPage({ params }) {
   const { slug } = await params
-  const competition = getCompetitionBySlug(slug)
 
-  if (!competition) notFound()
+  if (!getCompetitionBySlug(slug)) notFound()
 
-  const matches = await getCompetitionMatches(slug)
-
-  return <CompetitionDetailView competition={competition} matches={matches} />
+  return <CompetitionDetailDynamicMount slug={slug} />
 }

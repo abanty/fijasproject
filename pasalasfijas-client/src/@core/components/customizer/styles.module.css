@@ -3,8 +3,8 @@
   inline-size: 400px;
   display: flex;
   flex-direction: column;
-  background-color: var(--theme-paper-bg-solid, var(--mui-palette-background-paper));
-  background-image: var(--theme-paper-bg-gradient-layer, none);
+  background-color: var(--theme-customizer-bg, var(--theme-paper-bg-solid, var(--mui-palette-background-paper)));
+  background-image: none;
   position: fixed;
   inset-block-start: 0;
   inset-inline-end: -400px;

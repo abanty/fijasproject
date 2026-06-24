@@ -1,9 +1,12 @@
-/** Etiquetas de navegación — mismo contexto que referencias del sector, tono propio de Las fijas. */
+/**
+ * Navegación PLF — una fuente de verdad:
+ * - Header (horizontalMenuData): producto / herramientas de la plataforma
+ * - Sidebar (sidebarMenuData): Tu espacio (usuario) + Administración (solo admin)
+ */
 
 export const navigationSections = {
-  today: 'Hoy',
-  value: 'Lectura de valor',
-  account: 'Tu espacio'
+  account: 'Tu espacio',
+  administration: 'Administración'
 }
 
 const withActive = item => ({ ...item, active: true })
@@ -30,9 +33,15 @@ export const navigationItems = {
   },
   history: {
     id: 'history',
-    label: 'Bitácora de aciertos',
+    label: 'Mi bitácora',
     href: '/history',
     icon: 'ri-file-list-3-line'
+  },
+  bankroll: {
+    id: 'bankroll',
+    label: 'Mi banca',
+    href: '/bankroll',
+    icon: 'ri-wallet-3-line'
   },
   topOdds: {
     id: 'top-odds',
@@ -60,7 +69,7 @@ export const navigationItems = {
   },
   pricing: {
     id: 'pricing',
-    label: 'Membresías',
+    label: 'Membresía',
     href: '/pricing',
     icon: 'ri-vip-diamond-line'
   },
@@ -69,51 +78,89 @@ export const navigationItems = {
     label: 'Centro de ayuda',
     href: '/support',
     icon: 'ri-customer-service-2-line'
+  },
+  moreTools: {
+    id: 'more-tools',
+    label: 'Más herramientas',
+    icon: 'ri-tools-line',
+    children: [
+      {
+        id: 'odds-ev',
+        label: 'Línea vs casa',
+        href: '/odds-ev',
+        icon: 'ri-bar-chart-box-line'
+      },
+      {
+        id: 'ev',
+        label: 'Detector de valor',
+        href: '/ev',
+        icon: 'ri-money-dollar-circle-line'
+      },
+      {
+        id: 'bet-calculator',
+        label: 'Arma tu combinada',
+        href: '/bet-calculator',
+        icon: 'ri-calculator-line'
+      }
+    ]
   }
 }
 
-export const sidebarMenuData = () => [
-  {
-    section: navigationSections.today,
-    items: [
-      withActive(navigationItems.home),
-      withActive(navigationItems.competitions),
-      withActive(navigationItems.predictions),
-      withActive(navigationItems.history)
-    ]
-  },
-  {
-    section: navigationSections.value,
-    items: [
-      withActive(navigationItems.topOdds),
-      withActive(navigationItems.oddsEv),
-      withActive(navigationItems.ev),
-      withActive(navigationItems.betCalculator)
-    ]
-  },
-  {
-    section: navigationSections.account,
-    items: [withActive(navigationItems.pricing), withActive(navigationItems.support)]
+/** Sidebar — módulos de administración (agregar entradas aquí a futuro) */
+export const adminNavigationItems = {
+  operationsHub: {
+    id: 'admin-operations-hub',
+    label: 'Datos y operaciones',
+    href: '/admin',
+    icon: 'ri-settings-3-line'
   }
-]
+}
 
+/** Sidebar izquierdo — Tu espacio (todos) + Administración (solo admin) */
+export const getSidebarMenuData = ({ isAdmin = false } = {}) => {
+  const sections = [
+    {
+      section: navigationSections.account,
+      items: [
+        withActive(navigationItems.history),
+        withActive(navigationItems.bankroll),
+        withActive(navigationItems.pricing),
+        withActive(navigationItems.support)
+      ]
+    }
+  ]
+
+  if (isAdmin) {
+    sections.push({
+      section: navigationSections.administration,
+      items: Object.values(adminNavigationItems).map(withActive)
+    })
+  }
+
+  return sections
+}
+
+export const sidebarMenuData = () => getSidebarMenuData()
+
+/** Header — producto y herramientas de análisis */
 export const horizontalMenuData = () => [
+  navigationItems.predictions,
   navigationItems.home,
   navigationItems.competitions,
-  navigationItems.predictions,
-  navigationItems.history,
-  navigationItems.pricing
+  navigationItems.topOdds,
+  navigationItems.moreTools
 ]
 
 export const verticalMenuData = () => [
+  navigationItems.predictions,
   navigationItems.home,
   navigationItems.competitions,
-  navigationItems.predictions,
-  navigationItems.history,
   navigationItems.topOdds,
   navigationItems.oddsEv,
   navigationItems.ev,
   navigationItems.betCalculator,
+  navigationItems.history,
+  navigationItems.bankroll,
   navigationItems.pricing,
   navigationItems.support
 ]

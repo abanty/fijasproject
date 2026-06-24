@@ -1,3 +1,4 @@
+import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import CardHeader from '@mui/material/CardHeader'
@@ -5,6 +6,7 @@ import Chip from '@mui/material/Chip'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 
+import Link from '@components/Link'
 import CardStatVertical from '@components/card-statistics/Vertical'
 import CustomAvatar from '@core/components/mui/Avatar'
 import { formatConfidence, formatMarket, formatOdd, resultLabels } from '@/lib/predictionFormatters'
@@ -17,7 +19,33 @@ const getResultColor = status => {
   return 'default'
 }
 
-const HistoryView = ({ history }) => {
+const HistoryView = ({ historyData }) => {
+  if (historyData?.locked) {
+    return (
+      <div className='page-stack flex flex-col gap-6'>
+        <div>
+          <Typography variant='h4'>Mi bitácora</Typography>
+          <Typography color='text.secondary'>
+            Seguimiento de fijas publicadas: resultados, precisión y rendimiento.
+          </Typography>
+        </div>
+        <Card>
+          <CardContent className='flex flex-col gap-4 items-start'>
+            <Typography className='font-medium'>Historial disponible en Premium</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              El plan gratuito no incluye bitácora completa. Mejora tu membresía para ver picks cerrados, win rate y
+              rendimiento.
+            </Typography>
+            <Button variant='contained' component={Link} href='/pricing'>
+              Ver membresía
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const history = historyData?.items ?? []
   const won = history.filter(item => item.resultStatus === 'WON').length
   const settled = history.filter(item => item.resultStatus !== 'PENDING').length
   const winRate = settled ? Math.round((won / settled) * 100) : 0
@@ -25,7 +53,7 @@ const HistoryView = ({ history }) => {
   return (
     <div className='page-stack flex flex-col gap-6'>
       <div>
-        <Typography variant='h4'>Bitácora de aciertos</Typography>
+        <Typography variant='h4'>Mi bitácora</Typography>
         <Typography color='text.secondary'>Seguimiento de fijas publicadas: resultados, precisión y rendimiento.</Typography>
       </div>
 
@@ -62,7 +90,8 @@ const HistoryView = ({ history }) => {
       <Card>
         <CardHeader title='Historial de picks' subheader='Resultados trackeados internamente' />
         <CardContent className='flex flex-col gap-[1.71rem]'>
-          {history.map(item => (
+          {history.length ? (
+            history.map(item => (
             <div key={item.id} className='flex items-start gap-3'>
               <CustomAvatar color={getResultColor(item.resultStatus)} skin='light' size={38}>
                 <i className='ri-football-line text-lg' />
@@ -87,7 +116,10 @@ const HistoryView = ({ history }) => {
                 />
               </div>
             </div>
-          ))}
+            ))
+          ) : (
+            <Typography color='text.secondary'>Aun no hay picks cerrados en el historial.</Typography>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -61,6 +61,9 @@ const input = {
         '&:not(.Mui-focused):not(.Mui-error):not(.Mui-disabled):hover .MuiOutlinedInput-notchedOutline': {
           borderColor: 'var(--mui-palette-action-active)'
         },
+        '&.Mui-error .MuiOutlinedInput-notchedOutline': {
+          borderColor: 'var(--mui-palette-error-main)'
+        },
         '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
           borderColor: 'var(--mui-palette-action-disabledBackground)'
         }

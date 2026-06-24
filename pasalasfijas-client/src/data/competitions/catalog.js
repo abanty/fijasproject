@@ -17,7 +17,8 @@ export const competitionsCatalog = [
       'El torneo más grande del mundo. 48 selecciones, 104 partidos y predicciones IA para cada encuentro.',
     icon: 'ri-trophy-line',
     matchCountLabel: '104 partidos',
-    featured: true
+    featured: true,
+    cardBackgroundImage: '/images/illustrations/wallpapers/background-cards-dark.png'
   }
 ]
 

@@ -1,6 +1,19 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../shared/prisma/prisma.service'
-import { PredictionBundle, PredictionRepository } from '../../domain/repositories/prediction.repository'
+import { PredictionBundle, PredictionRepository, HistoryPickRecord } from '../../domain/repositories/prediction.repository'
+
+const predictionInclude = {
+  picks: true,
+  comboBets: { include: { legs: { include: { pick: true }, orderBy: { order: 'asc' as const } } } },
+  match: {
+    include: {
+      homeTeam: true,
+      awayTeam: true,
+      competition: true,
+      odds: true,
+    },
+  },
+}
 
 @Injectable()
 export class PrismaPredictionRepository implements PredictionRepository {
@@ -17,16 +30,36 @@ export class PrismaPredictionRepository implements PredictionRepository {
         match: { kickoffAt: { gte: start, lte: end } },
         status: 'COMPLETED',
       },
-      include: { picks: true, comboBets: true },
-      orderBy: { createdAt: 'desc' },
-    })
+      include: predictionInclude,
+      orderBy: { match: { kickoffAt: 'asc' } },
+    }) as Promise<PredictionBundle[]>
   }
 
-  findByMatchId(matchId: string): Promise<PredictionBundle | null> {
+  findByMatchId(matchId: number): Promise<PredictionBundle | null> {
     return this.prisma.aiAnalysis.findFirst({
       where: { matchId, status: 'COMPLETED' },
-      include: { picks: true, comboBets: true },
+      include: predictionInclude,
       orderBy: { createdAt: 'desc' },
-    })
+    }) as Promise<PredictionBundle | null>
+  }
+
+  findHistoryMainPicks(limit = 50): Promise<HistoryPickRecord[]> {
+    return this.prisma.pick.findMany({
+      where: {
+        pickType: 'MAIN',
+        status: 'PUBLISHED',
+        resultStatus: { not: 'PENDING' },
+      },
+      include: {
+        match: {
+          include: {
+            homeTeam: true,
+            awayTeam: true,
+          },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+      take: limit,
+    }) as Promise<HistoryPickRecord[]>
   }
 }

@@ -64,15 +64,26 @@ const ThemeSurfaceSync = ({ systemMode = 'light' }) => {
     settings.mode === 'system' ? (isDark ? 'dark' : 'light') : settings.mode === 'dark' ? 'dark' : 'light'
 
   useEffect(() => {
-    applyClientThemeRoot(settings, systemPreference)
+    let frameId = 0
 
-    const refresh = () => applyClientThemeRoot(settings, systemPreference)
+    const apply = () => {
+      if (document.querySelector('[data-auth-page="true"]')) return
+      applyClientThemeRoot(settings, systemPreference)
+    }
+
+    frameId = requestAnimationFrame(apply)
+
+    const refresh = () => {
+      cancelAnimationFrame(frameId)
+      frameId = requestAnimationFrame(apply)
+    }
 
     window.addEventListener(BODY_BG_IMAGE_CHANGED, refresh)
     window.addEventListener(SIDEBAR_BG_IMAGE_CHANGED, refresh)
     window.addEventListener(HEADER_BG_IMAGE_CHANGED, refresh)
 
     return () => {
+      cancelAnimationFrame(frameId)
       window.removeEventListener(BODY_BG_IMAGE_CHANGED, refresh)
       window.removeEventListener(SIDEBAR_BG_IMAGE_CHANGED, refresh)
       window.removeEventListener(HEADER_BG_IMAGE_CHANGED, refresh)

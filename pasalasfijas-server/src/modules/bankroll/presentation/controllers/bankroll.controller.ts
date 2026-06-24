@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common'
-import { CurrentUser, CurrentUserPayload } from '../../../../shared/security/current-user.decorator'
+import { CurrentUser, type CurrentUserPayload } from '../../../../shared/security/current-user.decorator'
 import { JwtAuthGuard } from '../../../auth/presentation/guards/jwt-auth.guard'
 import { CreateBankrollUseCase } from '../../application/use-cases/create-bankroll.use-case'
 import { GetBankrollUseCase } from '../../application/use-cases/get-bankroll.use-case'

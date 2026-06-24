@@ -2,29 +2,29 @@ import { defaultDarkThemeSettings } from './defaultDarkTheme'
 import { defaultLightThemeSettings } from './defaultLightTheme'
 
 /*
- * Valores base = defaultLightTheme. Dark usa defaultDarkTheme al cambiar modo.
+ * Valores base = defaultDarkTheme (arranque en dark). Light al cambiar modo.
  * Si no ves cambios en dev, la cookie del Customizer tiene prioridad:
  * reset en Customizer o borra "materio-mui-next-demo" en Application/Storage.
  */
 const themeConfig = {
   templateName: 'PasalasFijas',
-  homePageUrl: '/dashboard',
+  homePageUrl: '/predictions',
   settingsCookieName: 'materio-mui-next-demo',
   defaultLightTheme: defaultLightThemeSettings,
   defaultDarkTheme: defaultDarkThemeSettings,
-  ...defaultLightThemeSettings,
+  ...defaultDarkThemeSettings,
   layoutPadding: 24,
   compactContentWidth: 1440,
   navbar: {
     type: 'fixed',
-    contentWidth: defaultLightThemeSettings.navbarContentWidth,
+    contentWidth: defaultDarkThemeSettings.navbarContentWidth,
     floating: false,
     detached: true,
     blur: true
   },
   footer: {
     type: 'static',
-    contentWidth: defaultLightThemeSettings.footerContentWidth,
+    contentWidth: defaultDarkThemeSettings.footerContentWidth,
     detached: true
   },
   disableRipple: false

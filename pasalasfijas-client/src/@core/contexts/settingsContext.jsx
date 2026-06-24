@@ -51,7 +51,7 @@ export const SettingsProvider = props => {
     headerBgGradient: themeConfig.headerBgGradient
   }
 
-  const systemPreference = props.systemMode ?? 'light'
+  const systemPreference = props.systemMode ?? themeConfig.mode ?? 'dark'
 
   const updatedInitialSettings = normalizeThemeSettings(
     {

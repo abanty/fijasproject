@@ -86,10 +86,12 @@ enum AccessType {
 }
 
 model User {
-  id              String               @id @default(uuid())
-  email           String               @unique
+  id              Int                  @id @default(autoincrement())
+  email           String               @unique @db.VarChar(255)
   passwordHash    String
-  name            String?
+  name            String?              @db.VarChar(255)
+  emailVerified   Boolean              @default(false)
+  lastLoginAt     DateTime?            @db.Timestamptz(6)
   role            UserRole             @default(USER)
   status          UserStatus           @default(ACTIVE)
   profile         UserProfile?
@@ -97,23 +99,32 @@ model User {
   predictionViews UserPredictionView[]
   bankroll        UserBankroll?
   betTrackings    UserBetTracking[]
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
+  createdAt       DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime             @updatedAt @db.Timestamptz(6)
 }
 
 model UserProfile {
-  id                String  @id @default(uuid())
-  userId            String  @unique
-  country           String?
-  timezone          String? @default("America/Lima")
-  preferredLanguage String? @default("es")
-  avatarUrl         String?
-  riskPreference    String? @default("CONSERVATIVE")
+  id                Int     @id @default(autoincrement())
+  userId            Int     @unique
+  firstName         String? @db.VarChar(100)
+  lastName          String? @db.VarChar(100)
+  phone             String? @db.VarChar(20)
+  document          String? @db.VarChar(50)
+  address           String? @db.VarChar(255)
+  city              String? @db.VarChar(100)
+  country           String? @db.VarChar(100)
+  postalCode        String? @db.VarChar(20)
+  timezone          String? @default("America/Lima") @db.VarChar(100)
+  preferredLanguage String? @default("es") @db.VarChar(50)
+  avatarUrl         String? @db.VarChar(255)
+  gender            String? @db.VarChar(20)
+  occupation        String? @db.VarChar(100)
+  riskPreference    String? @default("CONSERVATIVE") @db.VarChar(50)
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Plan {
-  id                    String         @id @default(uuid())
+  id                    Int            @id @default(autoincrement())
   code                  String         @unique
   name                  String
   price                 Decimal        @default(0)
@@ -128,26 +139,26 @@ model Plan {
 }
 
 model Subscription {
-  id                     String             @id @default(uuid())
-  userId                 String
-  planId                 String
+  id                     Int                @id @default(autoincrement())
+  userId                 Int
+  planId                 Int
   status                 SubscriptionStatus @default(ACTIVE)
-  startedAt              DateTime           @default(now())
-  expiresAt              DateTime?
+  startedAt              DateTime           @default(now()) @db.Timestamptz(6)
+  expiresAt              DateTime?          @db.Timestamptz(6)
   provider               String?
   providerCustomerId     String?
   providerSubscriptionId String?
   user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan                   Plan               @relation(fields: [planId], references: [id])
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  createdAt              DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime           @updatedAt @db.Timestamptz(6)
 
   @@index([userId, status])
 }
 
 model Competition {
-  id         String   @id @default(uuid())
-  externalId String?
+  id         Int      @id @default(autoincrement())
+  externalId String?  @unique
   name       String
   country    String?
   type       String?
@@ -157,21 +168,21 @@ model Competition {
 }
 
 model Season {
-  id            String      @id @default(uuid())
-  competitionId String
+  id            Int         @id @default(autoincrement())
+  competitionId Int
   externalId    String?
   name          String?
   year          Int?
-  startDate     DateTime?
-  endDate       DateTime?
+  startDate     DateTime?   @db.Timestamptz(6)
+  endDate       DateTime?   @db.Timestamptz(6)
   status        String?
   competition   Competition @relation(fields: [competitionId], references: [id])
   matches       Match[]
 }
 
 model Team {
-  id          String                   @id @default(uuid())
-  externalId  String?
+  id          Int                      @id @default(autoincrement())
+  externalId  String?                  @unique
   name        String
   shortName   String?
   country     String?
@@ -185,32 +196,33 @@ model Team {
 }
 
 model Match {
-  id             String                   @id @default(uuid())
-  externalId     String?
-  competitionId  String
-  seasonId       String?
-  homeTeamId     String
-  awayTeamId     String
-  kickoffAt      DateTime
-  status         MatchStatus              @default(SCHEDULED)
-  venue          String?
-  homeScore      Int?
-  awayScore      Int?
-  winnerTeamId   String?
-  competition    Competition              @relation(fields: [competitionId], references: [id])
-  season         Season?                  @relation(fields: [seasonId], references: [id])
-  homeTeam       Team                     @relation("HomeTeam", fields: [homeTeamId], references: [id])
-  awayTeam       Team                     @relation("AwayTeam", fields: [awayTeamId], references: [id])
-  forms          TeamRecentForm[]
-  statsSnapshots MatchTeamStatsSnapshot[]
-  standings      StandingSnapshot[]
-  absences       PlayerAbsence[]
-  odds           OddsSnapshot[]
-  analyses       AiAnalysis[]
-  picks          Pick[]
+  id              Int                      @id @default(autoincrement())
+  externalId      String?                  @unique
+  competitionId   Int
+  seasonId        Int?
+  homeTeamId      Int
+  awayTeamId      Int
+  kickoffAt       DateTime                 @db.Timestamptz(6)
+  status          MatchStatus              @default(SCHEDULED)
+  venue           String?
+  stageLabel      String?
+  homeScore       Int?
+  awayScore       Int?
+  winnerTeamId    Int?
+  competition     Competition              @relation(fields: [competitionId], references: [id])
+  season          Season?                  @relation(fields: [seasonId], references: [id])
+  homeTeam        Team                     @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam        Team                     @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  forms           TeamRecentForm[]
+  statsSnapshots  MatchTeamStatsSnapshot[]
+  standings       StandingSnapshot[]
+  absences        PlayerAbsence[]
+  odds            OddsSnapshot[]
+  analyses        AiAnalysis[]
+  picks           Pick[]
   predictionViews UserPredictionView[]
-  createdAt      DateTime                 @default(now())
-  updatedAt      DateTime                 @updatedAt
+  createdAt       DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime                 @updatedAt @db.Timestamptz(6)
 
   @@index([kickoffAt])
   @@index([status])
@@ -218,9 +230,9 @@ model Match {
 }
 
 model TeamRecentForm {
-  id            String   @id @default(uuid())
-  teamId        String
-  matchId       String?
+  id            Int      @id @default(autoincrement())
+  teamId        Int
+  matchId       Int?
   scope         String
   last5Summary  Json?
   last10Summary Json?
@@ -235,38 +247,38 @@ model TeamRecentForm {
   avgXga        Decimal?
   team          Team     @relation(fields: [teamId], references: [id])
   match         Match?   @relation(fields: [matchId], references: [id])
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model MatchTeamStatsSnapshot {
-  id                String   @id @default(uuid())
-  matchId           String
-  teamId            String
-  side              Side
-  goalsForAvg       Decimal?
-  goalsAgainstAvg   Decimal?
-  xgAvg             Decimal?
-  xgaAvg            Decimal?
-  shotsAvg          Decimal?
-  shotsOnTargetAvg  Decimal?
-  cornersForAvg     Decimal?
-  cornersAgainstAvg Decimal?
-  cardsAvg          Decimal?
-  bttsRate          Decimal?
-  over15Rate        Decimal?
-  over25Rate        Decimal?
-  over35Rate        Decimal?
-  cleanSheetRate    Decimal?
-  firstGoalRate     Decimal?
-  match             Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  team              Team     @relation(fields: [teamId], references: [id])
-  createdAt         DateTime @default(now())
+  id                  Int      @id @default(autoincrement())
+  matchId             Int
+  teamId              Int
+  side                Side
+  goalsForAvg         Decimal?
+  goalsAgainstAvg     Decimal?
+  xgAvg               Decimal?
+  xgaAvg              Decimal?
+  shotsAvg            Decimal?
+  shotsOnTargetAvg    Decimal?
+  cornersForAvg       Decimal?
+  cornersAgainstAvg   Decimal?
+  cardsAvg            Decimal?
+  bttsRate            Decimal?
+  over15Rate          Decimal?
+  over25Rate          Decimal?
+  over35Rate          Decimal?
+  cleanSheetRate      Decimal?
+  firstGoalRate       Decimal?
+  match               Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team                Team     @relation(fields: [teamId], references: [id])
+  createdAt           DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model StandingSnapshot {
-  id             String   @id @default(uuid())
-  matchId        String
-  teamId         String
+  id             Int      @id @default(autoincrement())
+  matchId        Int
+  teamId         Int
   position       Int?
   points         Int?
   played         Int?
@@ -279,13 +291,13 @@ model StandingSnapshot {
   contextLabel   String?
   match          Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
   team           Team     @relation(fields: [teamId], references: [id])
-  createdAt      DateTime @default(now())
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model PlayerAbsence {
-  id         String   @id @default(uuid())
-  matchId    String
-  teamId     String
+  id         Int      @id @default(autoincrement())
+  matchId    Int
+  teamId     Int
   playerName String
   reason     String?
   importance String?
@@ -294,24 +306,24 @@ model PlayerAbsence {
   source     String?
   match      Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
   team       Team     @relation(fields: [teamId], references: [id])
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model OddsSnapshot {
-  id                 String   @id @default(uuid())
-  matchId            String
+  id                 Int      @id @default(autoincrement())
+  matchId            Int
   market             String
   selection          String
   odd                Decimal
   impliedProbability Decimal?
   provider           String?
-  capturedAt         DateTime @default(now())
+  capturedAt         DateTime @default(now()) @db.Timestamptz(6)
   match              Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
 }
 
 model AiAnalysis {
-  id            String          @id @default(uuid())
-  matchId       String
+  id            Int             @id @default(autoincrement())
+  matchId       Int
   model         String
   promptVersion String
   inputHash     String?
@@ -328,71 +340,71 @@ model AiAnalysis {
   match         Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
   picks         Pick[]
   comboBets     ComboBet[]
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createdAt     DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime        @updatedAt @db.Timestamptz(6)
 
   @@index([matchId])
 }
 
 model Pick {
-  id                   String           @id @default(uuid())
-  analysisId           String
-  matchId              String
-  market               PickMarket
-  selection            String
-  pickType             PickType         @default(ALTERNATIVE)
-  confidence           ConfidenceLevel
-  riskScore            Int?
-  valueScore           Int?
+  id                    Int              @id @default(autoincrement())
+  analysisId            Int
+  matchId               Int
+  market                PickMarket
+  selection             String
+  pickType              PickType         @default(ALTERNATIVE)
+  confidence            ConfidenceLevel
+  riskScore             Int?
+  valueScore            Int?
   suggestedStakePercent Int?
-  odd                  Decimal?
-  probabilityEstimated Decimal?
-  expectedValue        Decimal?
-  rationale            String?
-  status               String           @default("PUBLISHED")
-  resultStatus         PickResultStatus @default(PENDING)
-  analysis             AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  match                Match            @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  comboLegs            ComboBetLeg[]
-  userTrackings        UserBetTracking[]
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
+  odd                   Decimal?
+  probabilityEstimated  Decimal?
+  expectedValue         Decimal?
+  rationale             String?
+  status                String           @default("PUBLISHED")
+  resultStatus          PickResultStatus @default(PENDING)
+  analysis              AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  match                 Match            @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  comboLegs             ComboBetLeg[]
+  userTrackings         UserBetTracking[]
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime         @updatedAt @db.Timestamptz(6)
 
   @@index([matchId])
   @@index([analysisId])
 }
 
 model ComboBet {
-  id                   String           @id @default(uuid())
-  analysisId           String
-  title                String
-  confidence           ConfidenceLevel
-  riskScore            Int?
-  totalOdd             Decimal?
+  id                    Int              @id @default(autoincrement())
+  analysisId            Int
+  title                 String
+  confidence            ConfidenceLevel
+  riskScore             Int?
+  totalOdd              Decimal?
   suggestedStakePercent Int?
-  rationale            String?
-  status               String           @default("PUBLISHED")
-  resultStatus         PickResultStatus @default(PENDING)
-  analysis             AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
-  legs                 ComboBetLeg[]
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
+  rationale             String?
+  status                String           @default("PUBLISHED")
+  resultStatus          PickResultStatus @default(PENDING)
+  analysis              AiAnalysis       @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+  legs                  ComboBetLeg[]
+  createdAt             DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime         @updatedAt @db.Timestamptz(6)
 }
 
 model ComboBetLeg {
-  id         String   @id @default(uuid())
-  comboBetId String
-  pickId     String
+  id         Int      @id @default(autoincrement())
+  comboBetId Int
+  pickId     Int
   order      Int      @default(1)
   comboBet   ComboBet @relation(fields: [comboBetId], references: [id], onDelete: Cascade)
   pick       Pick     @relation(fields: [pickId], references: [id])
 }
 
 model UserPredictionView {
-  id         String     @id @default(uuid())
-  userId     String
-  matchId    String
-  viewedAt   DateTime   @default(now())
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  matchId    Int
+  viewedAt   DateTime   @default(now()) @db.Timestamptz(6)
   accessType AccessType
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   match      Match      @relation(fields: [matchId], references: [id], onDelete: Cascade)
@@ -401,28 +413,28 @@ model UserPredictionView {
 }
 
 model UserBankroll {
-  id            String   @id @default(uuid())
-  userId        String   @unique
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
   initialAmount Decimal
   currentAmount Decimal
   currency      String   @default("USD")
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(6)
 }
 
 model UserBetTracking {
-  id          String           @id @default(uuid())
-  userId      String
-  pickId      String
+  id          Int              @id @default(autoincrement())
+  userId      Int
+  pickId      Int
   stakeAmount Decimal
   oddTaken    Decimal?
   status      PickResultStatus @default(PENDING)
   profitLoss  Decimal?
   user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   pick        Pick             @relation(fields: [pickId], references: [id])
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(6)
 
   @@index([userId])
 }

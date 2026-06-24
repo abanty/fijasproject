@@ -3,6 +3,7 @@ import { fontFamilyCatalog } from '@configs/fontFamilyOptions'
 import {
   getDefaultThemeSettingsForMode,
   getModeSurfaceDefaults,
+  GRADIENT_SETTING_KEYS,
   isLegacyDarkSurfaceValue,
   isLegacyLightSurfaceValue,
   MODE_SURFACE_KEYS,
@@ -43,6 +44,9 @@ export const normalizeThemeSettings = (settings = {}, systemPreference = 'light'
     if (IMAGE_ENABLED_KEYS.has(key)) return
 
     const value = next[key]
+
+    // null en gradientes = desactivado explícitamente en el customizer (no re-aplicar defaults)
+    if (GRADIENT_SETTING_KEYS.has(key) && value === null) return
 
     const shouldUseModeDefault =
       effectiveMode === 'dark'

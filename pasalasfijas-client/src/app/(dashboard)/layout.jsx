@@ -8,6 +8,7 @@ import HorizontalLayout from '@layouts/HorizontalLayout'
 
 // Component Imports
 import Providers from '@components/Providers'
+import DashboardAuthShell from '@components/auth/DashboardAuthShell'
 import Navigation from '@components/layout/vertical/Navigation'
 import Header from '@components/layout/horizontal/Header'
 import Navbar from '@components/layout/vertical/Navbar'
@@ -36,12 +37,12 @@ const Layout = async props => {
         systemMode={systemMode}
         verticalLayout={
           <VerticalLayout navigation={<Navigation mode={mode} />} navbar={<Navbar />} footer={<VerticalFooter />}>
-            {children}
+            <DashboardAuthShell>{children}</DashboardAuthShell>
           </VerticalLayout>
         }
         horizontalLayout={
           <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
-            {children}
+            <DashboardAuthShell>{children}</DashboardAuthShell>
           </HorizontalLayout>
         }
       />

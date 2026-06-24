@@ -39,13 +39,13 @@ const PredictionsView = () => {
   const unlockedPicks = data.items.filter(item => !item.isLocked && item.analysis?.confidence !== 'NO_BET')
 
   return (
-    <div className='page-stack flex flex-col gap-6'>
+    <div className='page-stack flex flex-col gap-2'>
       <div className='flex items-center gap-1'>
-        <div className='relative z-[2] flex min-is-0 items-center gap-2'>
+        <div className='relative z-2 flex min-is-0 items-center gap-2'>
           <img
             src={ROCKET_ICON}
             alt=''
-            className='-mis-4 sm:-mis-6 is-[52px] bs-[52px] sm:is-[60px] sm:bs-[60px] shrink-0 object-contain object-left'
+            className='-mis-4 sm:-mis-6 size-[52px] sm:size-[60px] shrink-0 object-contain object-left'
           />
           <Typography variant='h4' component='h1'>
             Fijas recomendadas

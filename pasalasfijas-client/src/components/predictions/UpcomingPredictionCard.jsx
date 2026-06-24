@@ -83,9 +83,9 @@ const UpcomingPredictionCard = ({ prediction }) => {
       <CardContent className={classnames('upcoming-prediction-card__content match-of-day-body')}>
         <div className='match-of-day-watermark' aria-hidden />
 
-        <div className='p-2 flex flex-col gap-3'>
-          <div className='upcoming-prediction-card__toolbar relative z-[1] flex items-start justify-between gap-2'>
-            <div className='flex flex-wrap items-center gap-2 min-is-0'>
+        <div className='p-2 flex flex-col gap-0'>
+          <div className='upcoming-prediction-card__toolbar relative z-1 grid grid-cols-[1fr_auto_1fr] items-start gap-x-2 gap-y-1'>
+            <div className='flex flex-wrap items-center gap-2 justify-self-start min-inline-0'>
               <Chip
                 size='small'
                 variant='tonal'
@@ -101,8 +101,15 @@ const UpcomingPredictionCard = ({ prediction }) => {
                 />
               ) : null}
             </div>
-
-            <div className='upcoming-prediction-card__actions flex items-center gap-0 shrink-0'>
+            <div className='match-of-day-title justify-self-center px-1 min-inline-0 max-w-full'>
+              <Typography
+                variant={compact ? 'subtitle1' : 'h6'}
+                className='match-of-day-match-title block text-center font-bold'
+              >
+                {prediction.homeTeam} - {prediction.awayTeam}
+              </Typography>
+            </div>
+            <div className='upcoming-prediction-card__actions flex items-center gap-0 justify-self-end shrink-0'>
               {xg ? <HelpInfoTooltip title={predictionsHelp.xg} iconClassName='ri-question-line' /> : null}
               {prediction.dataQuality === 'sufficient' ? (
                 <HelpInfoTooltip title={predictionsHelp.dataQuality} iconClassName='ri-shield-check-line' />
@@ -128,14 +135,6 @@ const UpcomingPredictionCard = ({ prediction }) => {
             </div>
           </div>
 
-          <div className='match-of-day-title'>
-            <Typography              variant={compact ? 'subtitle1' : 'h6'}
-              className='match-of-day-match-title block text-center font-bold'
-            >
-              {prediction.homeTeam} - {prediction.awayTeam}
-            </Typography>
-          </div>
-
           <div className='match-of-day-faceoff'>
             <div className='flex min-is-0 flex-col items-center gap-1'>
               <CountryFlag
@@ -148,7 +147,9 @@ const UpcomingPredictionCard = ({ prediction }) => {
                 {prediction.homeCountryCode || 'LOC'}
               </Typography>
             </div>
-            <div className='match-of-day-time'>              <Typography variant='h6' className='font-bold tabular-nums leading-none'>
+            <div className='match-of-day-time'>
+              {' '}
+              <Typography variant='h6' className='font-bold tabular-nums leading-none'>
                 {time}
               </Typography>
               <Typography variant='caption' color='text.secondary' className='tabular-nums'>
@@ -171,9 +172,12 @@ const UpcomingPredictionCard = ({ prediction }) => {
                 {prediction.awayCountryCode || 'VIS'}
               </Typography>
             </div>
-          </div>          <div className='upcoming-prediction-card__outcome mt-2'>
-            {showModel ? (              <MatchOutcomeBar probabilities={probs} />
-            ) : (              <div className='upcoming-prediction-card__locked flex items-center justify-center gap-1 rounded-md border border-dashed px-3 py-2.5'>
+          </div>
+          <div className='upcoming-prediction-card__outcome mt-2'>
+            {showModel ? (
+              <MatchOutcomeBar probabilities={probs} />
+            ) : (
+              <div className='upcoming-prediction-card__locked flex items-center justify-center gap-1 rounded-md border border-dashed px-3 py-2.5'>
                 <RemixIcon icon='ri-lock-line' size='sm' className='text-textSecondary' />
                 <Typography variant='body2' color='text.secondary' className='font-medium'>
                   Premium

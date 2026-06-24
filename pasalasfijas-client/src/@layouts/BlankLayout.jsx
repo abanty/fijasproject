@@ -27,6 +27,7 @@ const BlankLayout = props => {
       <div
         className={classnames(blankLayoutClasses.root, 'is-full bs-full min-bs-[100dvh] w-full flex flex-col flex-auto')}
         data-skin={settings.skin}
+        data-auth-page='true'
       >
         {children}
       </div>

@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 
 export type CurrentUserPayload = {
-  sub: string
+  sub: number
   email: string
   role: string
 }

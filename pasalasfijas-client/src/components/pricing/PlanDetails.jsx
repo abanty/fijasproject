@@ -10,12 +10,14 @@ import classnames from 'classnames'
 // Component Imports
 import Link from '@components/Link'
 
-const PlanDetails = ({ data, pricingPlan }) => {
+const PlanDetails = ({ data, pricingPlan, onUpgrade, upgrading = false }) => {
   const price = pricingPlan === 'monthly' ? data?.monthlyPrice : data?.yearlyPlan.monthly
+  const isPremiumPlan = data?.code === 'PREMIUM'
+  const canUpgrade = isPremiumPlan && !data?.currentPlan && onUpgrade
 
   return (
     <CardContent
-      className={classnames('relative pli-5 !pbe-5 flex flex-col gap-5 border rounded pbs-[3.75rem]', {
+      className={classnames('relative pli-5 !pbe-5 flex flex-col gap-5 border rounded pbs-5', {
         'border-primary': data?.popularPlan
       })}
     >
@@ -28,14 +30,6 @@ const PlanDetails = ({ data, pricingPlan }) => {
           variant='tonal'
         />
       ) : null}
-      <div className='flex justify-center'>
-        <img
-          src={data?.imgSrc}
-          height={data?.imgHeight}
-          width={data?.imgWidth}
-          alt={`${data?.title.toLowerCase().replace(' ', '-')}-img`}
-        />
-      </div>
       <div className='text-center flex flex-col gap-1'>
         <Typography variant='h4'>{data?.title}</Typography>
         <Typography>{data?.subtitle}</Typography>
@@ -62,24 +56,23 @@ const PlanDetails = ({ data, pricingPlan }) => {
           </Typography>
         ) : null}
       </div>
-      <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-3'>
         {data?.planBenefits.map((item, index) => (
-          <div key={index} className='flex items-center gap-2'>
-            <span className='inline-flex'>
-              <i className='ri-checkbox-blank-circle-line text-sm text-textSecondary' />
-            </span>
-            <Typography>{item}</Typography>
-          </div>
+          <Typography key={index} color='text.secondary'>
+            {item}
+          </Typography>
         ))}
       </div>
       <Button
         fullWidth
-        component={data?.currentPlan ? undefined : Link}
-        href={data?.currentPlan ? undefined : '/pricing'}
+        component={canUpgrade ? undefined : data?.currentPlan ? undefined : Link}
+        href={canUpgrade || data?.currentPlan ? undefined : '/pricing'}
+        onClick={canUpgrade ? () => onUpgrade(data.code) : undefined}
+        disabled={canUpgrade && upgrading}
         color={data?.currentPlan ? 'success' : 'primary'}
         variant={data?.popularPlan ? 'contained' : 'outlined'}
       >
-        {data?.currentPlan ? 'Plan actual' : 'Mejorar plan'}
+        {data?.currentPlan ? 'Plan actual' : canUpgrade ? (upgrading ? 'Activando...' : 'Activar Premium') : 'Mejorar plan'}
       </Button>
     </CardContent>
   )

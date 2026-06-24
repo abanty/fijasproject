@@ -19,7 +19,7 @@
   --header-sticky-offset: 10px;
   --layout-padding: 20px;
   --body-shell-max-width: 1440px;
-  --sidebar-width: 256px;
+  --sidebar-width: 226px;
   --right-panel-width: 336px;
   --app-column-padding-block-start: var(--layout-padding);
   --app-column-padding-inline: var(--layout-padding);
@@ -208,16 +208,44 @@ html .MuiTypography-colorTextSecondary {
   color: var(--theme-body-fg-muted, var(--mui-palette-text-secondary));
 }
 
-html .MuiPaper-root:not(.MuiAlert-root),
-html .MuiCard-root {
+html .MuiPaper-root:not(.MuiAlert-root):not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg):not(.world-cup-match-card--has-bg),
+html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg):not(.world-cup-match-card--has-bg) {
   background-color: var(--theme-paper-bg-solid, var(--theme-paper-bg, var(--mui-palette-background-paper)));
   background-image: var(--theme-paper-bg-gradient-layer, none);
 }
 
-[data-dark] html .MuiCard-root:not(.MuiPaper-outlined) {
+[data-dark] html .MuiCard-root:not(.MuiPaper-outlined):not(.auth-card) {
   box-shadow:
     0 4px 18px rgb(0 0 0 / 0.4),
     0 2px 8px rgb(0 0 0 / 0.26);
+}
+
+/* Login/registro: no heredan el paper del dashboard (evita flash blanco al cerrar sesión) */
+[data-auth-page='true'] .auth-card.MuiCard-root {
+  background-color: var(--mui-palette-background-paper) !important;
+  background-image: none !important;
+  color: var(--mui-palette-text-primary);
+}
+
+[data-auth-page='true'] .auth-card .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess) {
+  color: var(--mui-palette-text-primary);
+}
+
+[data-auth-page='true'] .auth-card .MuiTypography-colorTextSecondary {
+  color: var(--mui-palette-text-secondary) !important;
+}
+
+[data-auth-page='true'] .auth-card .MuiOutlinedInput-root {
+  color: var(--mui-palette-text-primary);
+}
+
+[data-auth-page='true'] .auth-card .MuiOutlinedInput-notchedOutline {
+  border-color: var(--mui-palette-divider);
+}
+
+[data-auth-page='true'] .auth-card .MuiInputBase-input::placeholder {
+  color: var(--mui-palette-text-secondary);
+  opacity: 1;
 }
 
 .ts-vertical-layout-header,
@@ -257,6 +285,35 @@ html .MuiCard-root {
 .header-nav-band--detached.header-nav-band {
   padding-inline: var(--layout-padding);
   padding-block-start: var(--nav-highlight-badge-band-padding-block-start);
+}
+
+.header-nav-dropdown {
+  min-inline-size: 220px;
+}
+
+.header-nav-dropdown-paper {
+  overflow: hidden;
+  background-color: var(--mui-palette-background-default) !important;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.48) !important;
+}
+
+[data-mui-color-scheme='light'] .header-nav-dropdown-paper {
+  background-color: var(--mui-palette-background-paper) !important;
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.12) !important;
+}
+
+.header-nav-dropdown-list {
+  padding: 0.5rem !important;
+}
+
+.header-nav-dropdown-item {
+  border-radius: var(--mui-shape-borderRadius);
+  padding-block: 0.625rem !important;
+  padding-inline: 0.75rem !important;
+}
+
+.header-nav-dropdown-item + .header-nav-dropdown-item {
+  margin-block-start: 0.125rem;
 }
 
 /* Materio front-pages nav: MUI Typography anula hover:text-primary / text-primary de Tailwind */
@@ -1343,12 +1400,26 @@ html:not([data-dark]) .country-flag-asset-frame .country-flag-asset {
 }
 
 /* Contraste dinamico: cards, paneles, modales, customizer y menus flotantes */
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root),
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root),
-[data-paper-contrast='light-text'] .MuiCard-root,
-[data-paper-contrast='dark-text'] .MuiCard-root,
 [data-paper-contrast='light-text'] .customizer,
 [data-paper-contrast='dark-text'] .customizer {
+  --mui-palette-text-primary: var(--theme-paper-fg);
+  --mui-palette-text-secondary: var(--theme-paper-fg-muted);
+  --mui-palette-text-disabled: var(--theme-paper-fg-muted);
+  --mui-palette-action-active: var(--theme-paper-fg-muted);
+  --mui-palette-action-hover: var(--theme-paper-hover-bg);
+  --mui-palette-action-selected: var(--theme-paper-hover-bg);
+  --mui-palette-divider: var(--theme-paper-border);
+  --border-color: var(--theme-paper-border);
+  background: var(--theme-customizer-bg, var(--theme-paper-bg-solid, var(--theme-paper-bg))) !important;
+  background-image: none !important;
+  color: var(--theme-paper-fg);
+  border-color: var(--theme-card-border, var(--theme-paper-border));
+}
+
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg),
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg),
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg),
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) {
   --mui-palette-text-primary: var(--theme-paper-fg);
   --mui-palette-text-secondary: var(--theme-paper-fg-muted);
   --mui-palette-text-disabled: var(--theme-paper-fg-muted);
@@ -1362,57 +1433,64 @@ html:not([data-dark]) .country-flag-asset-frame .country-flag-asset {
   border-color: var(--theme-card-border, var(--theme-paper-border));
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
-[data-paper-contrast='light-text'] .MuiCard-root .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
 [data-paper-contrast='light-text'] .customizer .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess),
 [data-paper-contrast='dark-text'] .customizer .MuiTypography-root:not(.MuiTypography-colorPrimary):not(.MuiTypography-colorSecondary):not(.MuiTypography-colorError):not(.MuiTypography-colorWarning):not(.MuiTypography-colorInfo):not(.MuiTypography-colorSuccess) {
   color: inherit;
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiTypography-colorTextSecondary,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiTypography-colorTextSecondary,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiTypography-colorTextSecondary,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiTypography-colorTextSecondary,
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiTypography-colorTextSecondary,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiTypography-colorTextSecondary,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) .MuiTypography-colorTextSecondary,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) .MuiTypography-colorTextSecondary,
 [data-paper-contrast='light-text'] .customizer .MuiTypography-colorTextSecondary,
 [data-paper-contrast='dark-text'] .customizer .MuiTypography-colorTextSecondary {
   color: var(--theme-paper-fg-muted) !important;
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiListItemText-primary,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiListItemText-primary,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiListItemText-primary,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiListItemText-primary {
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiListItemText-primary,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiListItemText-primary,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiListItemText-primary,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiListItemText-primary {
   color: inherit !important;
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiListItemIcon-root,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiListItemIcon-root,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiListItemIcon-root,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiListItemIcon-root {
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiListItemIcon-root,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiListItemIcon-root,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiListItemIcon-root,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiListItemIcon-root {
   color: inherit;
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiOutlinedInput-root,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiOutlinedInput-root,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiOutlinedInput-root,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiOutlinedInput-root {
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-root,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-root,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-root,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-root {
   color: var(--theme-paper-fg);
   background-color: var(--theme-paper-input-bg, transparent);
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiOutlinedInput-notchedOutline,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiOutlinedInput-notchedOutline,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiOutlinedInput-notchedOutline,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiOutlinedInput-notchedOutline {
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-notchedOutline {
   border-color: var(--theme-paper-border);
 }
 
-[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiInputBase-input::placeholder,
-[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root) .MuiInputBase-input::placeholder,
-[data-paper-contrast='light-text'] .MuiCard-root .MuiInputBase-input::placeholder,
-[data-paper-contrast='dark-text'] .MuiCard-root .MuiInputBase-input::placeholder,
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+  border-color: var(--mui-palette-error-main);
+}
+
+[data-paper-contrast='light-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiInputBase-input::placeholder,
+[data-paper-contrast='dark-text'] .MuiPaper-root:not(.MuiAlert-root):not(.auth-card) .MuiInputBase-input::placeholder,
+[data-paper-contrast='light-text'] .MuiCard-root:not(.auth-card) .MuiInputBase-input::placeholder,
+[data-paper-contrast='dark-text'] .MuiCard-root:not(.auth-card) .MuiInputBase-input::placeholder,
 [data-paper-contrast='light-text'] .customizer .MuiInputBase-input::placeholder,
 [data-paper-contrast='dark-text'] .customizer .MuiInputBase-input::placeholder {
   color: var(--theme-paper-fg-muted);
@@ -1722,7 +1800,7 @@ code {
   opacity: 1;
 }
 
-.competition-card--featured {
+.competition-card--featured:not(.competition-card--has-bg):not(.world-cup-match-card--has-bg) {
   border-color: rgb(var(--mui-palette-primary-mainChannel) / 0.35);
   background:
     linear-gradient(
@@ -1738,10 +1816,90 @@ code {
   inline-size: 5px;
 }
 
+.competition-card--has-bg {
+  border-color: rgb(255 255 255 / 0.12);
+  background-color: transparent;
+  background-image: none;
+  color: #fff;
+}
+
+.competition-card--has-bg::before {
+  z-index: 2;
+  opacity: 0.9;
+}
+
+.competition-card__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transform: scale(1);
+  transition: transform 0.35s ease;
+}
+
+.competition-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(145deg, rgb(8 14 28 / 0.62) 0%, rgb(8 14 28 / 0.38) 48%, rgb(8 14 28 / 0.58) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.28) 0%, transparent 55%);
+  transition: background 0.25s ease;
+}
+
+.competition-card--has-bg:hover .competition-card__bg {
+  transform: scale(1.04);
+}
+
+.competition-card--has-bg:hover .competition-card__overlay {
+  background:
+    linear-gradient(145deg, rgb(8 14 28 / 0.7) 0%, rgb(8 14 28 / 0.45) 48%, rgb(8 14 28 / 0.65) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.28) 0%, transparent 55%);
+}
+
+.competition-card--has-bg .competition-card__title,
+.competition-card--has-bg .competition-card__cta {
+  color: #fff;
+}
+
+.competition-card--has-bg .competition-card__description {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.competition-card--has-bg .competition-card__icon {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+.competition-card--has-bg .competition-card__chip {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  border: 1px solid rgb(255 255 255 / 0.22);
+}
+
+.competition-card--has-bg:hover {
+  border-color: rgb(255 255 255 / 0.22);
+  box-shadow: 0 14px 36px rgb(0 0 0 / 0.28);
+}
+
+[data-dark] .competition-card--has-bg {
+  border-color: rgb(255 255 255 / 0.1);
+}
+
+[data-dark] .competition-card--has-bg .competition-card__overlay {
+  background:
+    linear-gradient(145deg, rgb(4 8 18 / 0.82) 0%, rgb(4 8 18 / 0.58) 48%, rgb(4 8 18 / 0.78) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.42) 0%, transparent 55%);
+}
+
 .competition-card__body {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   block-size: 100%;
+  background-color: transparent;
 }
 
 .competition-card__icon {
@@ -1915,5 +2073,182 @@ code {
 
 .match-outcome-bar__label--away {
   color: var(--mui-palette-info-main);
+}
+
+.world-cup-hub-tabs .MuiTabs-root ~ .MuiTabPanel-root {
+  padding-block-start: 0;
+}
+
+.world-cup-match-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.world-cup-match-card.MuiPaper-outlined {
+  border: none;
+}
+
+.world-cup-match-card--has-bg {
+  isolation: isolate;
+  overflow: hidden;
+  background-color: transparent;
+  background-image: none;
+  color: #fff;
+}
+
+.world-cup-match-card__media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.world-cup-match-card__bg {
+  position: absolute;
+  inset: -12px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(10px);
+  transform: scale(1.08);
+  transform-origin: center;
+}
+
+.world-cup-match-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(160deg, rgb(6 10 18 / 0.94) 0%, rgb(6 10 18 / 0.84) 52%, rgb(6 10 18 / 0.96) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.52) 0%, transparent 58%);
+  transition: background 0.25s ease;
+}
+
+.world-cup-match-card__body {
+  position: relative;
+  z-index: 2;
+  padding: 1rem 1.125rem 1.125rem;
+  background-color: transparent;
+}
+
+.world-cup-match-card__body:last-child {
+  padding-block-end: 1.125rem;
+}
+
+.world-cup-match-card__meta {
+  color: rgb(255 255 255 / 0.58);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.world-cup-match-card__meta-icon {
+  color: rgb(255 255 255 / 0.58);
+  flex-shrink: 0;
+}
+
+.world-cup-match-card__datetime {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  padding: 0.25rem 0.875rem;
+  border-radius: 999px;
+  border: none;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.world-cup-match-card__team,
+.world-cup-match-card__score {
+  color: #fff;
+}
+
+.world-cup-match-card__status {
+  color: rgb(255 255 255 / 0.58);
+  font-weight: 500;
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__meta,
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__meta-icon,
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__status {
+  color: var(--mui-palette-text-secondary);
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__team,
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__score {
+  color: var(--mui-palette-text-primary);
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg) .world-cup-match-card__datetime {
+  background: var(--mui-palette-action-hover);
+  color: var(--mui-palette-text-primary);
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.22s ease;
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgb(var(--mui-mainColorChannels-shadow) / 0.1);
+}
+
+.world-cup-match-card:not(.world-cup-match-card--has-bg):hover::after {
+  background: rgb(255 255 255 / 0.14);
+}
+
+[data-dark] .world-cup-match-card:not(.world-cup-match-card--has-bg):hover {
+  box-shadow: 0 10px 28px rgb(0 0 0 / 0.22);
+}
+
+[data-dark] .world-cup-match-card:not(.world-cup-match-card--has-bg):hover::after {
+  background: rgb(0 0 0 / 0.24);
+}
+
+.world-cup-match-card--has-bg:hover {
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.28);
+  transform: translateY(-2px);
+}
+
+.world-cup-match-card--has-bg:hover .world-cup-match-card__overlay {
+  background:
+    linear-gradient(160deg, rgb(4 8 16 / 0.96) 0%, rgb(4 8 16 / 0.88) 52%, rgb(4 8 16 / 0.98) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.58) 0%, transparent 58%);
+}
+
+#nprogress {
+  pointer-events: none;
+  z-index: 99999;
+}
+
+#nprogress .bar {
+  background: var(--mui-palette-primary-main);
+  block-size: 3px;
+}
+
+#nprogress .peg {
+  box-shadow:
+    0 0 10px var(--mui-palette-primary-main),
+    0 0 5px var(--mui-palette-primary-main);
 }
 

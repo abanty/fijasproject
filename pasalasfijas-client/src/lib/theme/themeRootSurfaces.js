@@ -2,7 +2,7 @@ import { applyCaptionSidebarCssVars } from '@core/theme/typographyTokens'
 import themeConfig from '@configs/themeConfig'
 import { getDefaultThemeSettingsForMode, resolveEffectiveThemeMode } from '@configs/modeThemeDefaults'
 import { getFontFamilyStack } from '@configs/fontFamilyOptions'
-import { getSurfaceContrastTokens, isLightBackground } from '@/lib/theme/colorContrast'
+import { getSurfaceContrastTokens, isLightBackground, liftSurfaceTone } from '@/lib/theme/colorContrast'
 import { getContrastColorForGradient, resolveSurfaceLayers } from '@/lib/theme/gradientSurface'
 import { normalizeThemeSettings } from '@/lib/theme/normalizeThemeSettings'
 import { resolveThemeSurface } from '@/lib/theme/resolveThemeSurface'
@@ -56,7 +56,12 @@ const buildSurfaceContrastVars = (vars, prefix, bg) => {
   })
 }
 
-const OPTIONAL_ROOT_CSS_VARS = ['--theme-card-border', '--header-bg-solid', '--theme-body-bg-image']
+const OPTIONAL_ROOT_CSS_VARS = [
+  '--theme-card-border',
+  '--header-bg-solid',
+  '--theme-body-bg-image',
+  '--theme-customizer-bg'
+]
 
 const resolveContrastAttribute = color => {
   if (!color || isTransparentSurface(color)) return null
@@ -129,6 +134,15 @@ export const buildThemeRootSnapshot = (settings = {}, systemPreference = 'light'
     'sidebar',
     isTransparentSurface(sidebarSolid) ? bodySurface.contrastColor : sidebarSurface.contrastColor
   )
+
+  const customizerBg =
+    paperSolid && !isTransparentSurface(paperSolid)
+      ? liftSurfaceTone(paperSolid, effectiveMode)
+      : null
+
+  if (customizerBg) {
+    setCssVar(cssVars, '--theme-customizer-bg', customizerBg)
+  }
 
   const primaryColor = normalized.primaryColor
 

@@ -1,6 +1,7 @@
 // Third-party Imports
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import 'animate.css/animate.min.css'
+import 'nprogress/nprogress.css'
 
 // Component Imports
 import ColorSchemeInitScript from '@components/theme/ColorSchemeInitScript'

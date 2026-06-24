@@ -1,12 +1,8 @@
 'use client'
 
-// React Imports
 import { useRef, useState } from 'react'
-
-// Next Imports
 import { useRouter } from 'next/navigation'
 
-// MUI Imports
 import { styled } from '@mui/material/styles'
 import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
@@ -15,15 +11,18 @@ import Fade from '@mui/material/Fade'
 import Paper from '@mui/material/Paper'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import MenuList from '@mui/material/MenuList'
+import MenuItem from '@mui/material/MenuItem'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
-// Hook Imports
+import Link from '@components/Link'
 import { useSettings } from '@core/hooks/useSettings'
+import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { logout } from '@/services/authService'
 
-// Styled component for badge content
+const DEFAULT_AVATAR = '/images/avatars/1.png'
+
 const BadgeContentSpan = styled('span')({
   width: 8,
   height: 8,
@@ -33,26 +32,29 @@ const BadgeContentSpan = styled('span')({
   boxShadow: '0 0 0 2px var(--mui-palette-background-paper)'
 })
 
+const getDisplayName = user => {
+  if (!user) return ''
+  if (user.name?.trim()) return user.name.trim()
+  if (user.profile?.firstName?.trim()) return user.profile.firstName.trim()
+  return user.email?.split('@')[0] || ''
+}
+
 const UserDropdown = () => {
-  // States
   const [open, setOpen] = useState(false)
-
-  // Refs
   const anchorRef = useRef(null)
-
-  // Hooks
   const router = useRouter()
   const { settings } = useSettings()
+  const { user } = useCurrentUser()
+
+  const displayName = getDisplayName(user)
+  const avatarSrc = user?.profile?.avatarUrl || DEFAULT_AVATAR
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN'
 
   const handleDropdownOpen = () => {
     !open ? setOpen(true) : setOpen(false)
   }
 
-  const handleDropdownClose = (event, url) => {
-    if (url) {
-      router.push(url)
-    }
-
+  const handleDropdownClose = event => {
     if (anchorRef.current && anchorRef.current.contains(event?.target)) {
       return
     }
@@ -60,9 +62,10 @@ const UserDropdown = () => {
     setOpen(false)
   }
 
-  const handleUserLogout = async () => {
-    // Redirect to login page
-    router.push('/login')
+  const handleUserLogout = () => {
+    logout()
+    setOpen(false)
+    router.replace('/login')
   }
 
   return (
@@ -76,8 +79,8 @@ const UserDropdown = () => {
       >
         <Avatar
           ref={anchorRef}
-          alt='John Doe'
-          src='/images/avatars/1.png'
+          alt={displayName}
+          src={avatarSrc}
           onClick={handleDropdownOpen}
           className='cursor-pointer bs-[38px] is-[38px]'
         />
@@ -88,7 +91,7 @@ const UserDropdown = () => {
         disablePortal
         placement='bottom-end'
         anchorEl={anchorRef.current}
-        className='min-is-[240px] !mbs-4 z-[1]'
+        className='min-is-[240px] !mbs-4 z-[1300]'
       >
         {({ TransitionProps, placement }) => (
           <Fade
@@ -97,46 +100,53 @@ const UserDropdown = () => {
               transformOrigin: placement === 'bottom-end' ? 'right top' : 'left top'
             }}
           >
-            <Paper className={settings.skin === 'bordered' ? 'border shadow-none' : 'shadow-lg'}>
-              <ClickAwayListener onClickAway={e => handleDropdownClose(e)}>
+            <Paper
+              elevation={settings.skin === 'bordered' ? 0 : 10}
+              className={settings.skin === 'bordered' ? 'border shadow-none' : undefined}
+            >
+              <ClickAwayListener onClickAway={handleDropdownClose}>
                 <MenuList>
                   <div className='flex items-center plb-2 pli-4 gap-2' tabIndex={-1}>
-                    <Avatar alt='John Doe' src='/images/avatars/1.png' />
+                    <Avatar alt={displayName} src={avatarSrc} />
                     <div className='flex items-start flex-col'>
                       <Typography className='font-medium' color='text.primary'>
-                        John Doe
+                        {displayName}
                       </Typography>
-                      <Typography variant='caption'>admin@materio.com</Typography>
+                      <Typography
+                        variant='body2'
+                        color='text.secondary'
+                        sx={{
+                          letterSpacing: 'normal',
+                          fontWeight: 400,
+                          lineHeight: 1.35,
+                          maxWidth: 168,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {user?.email || ''}
+                      </Typography>
                     </div>
                   </div>
                   <Divider className='mlb-1' />
-                  <MenuItem className='gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-user-3-line' />
-                    <Typography color='text.primary'>Mi Perfil</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-settings-4-line' />
-                    <Typography color='text.primary'>Configuración</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-money-dollar-circle-line' />
-                    <Typography color='text.primary'>Precios</Typography>
-                  </MenuItem>
-                  <MenuItem className='gap-3' onClick={e => handleDropdownClose(e)}>
-                    <i className='ri-question-line' />
-                    <Typography color='text.primary'>Preguntas Frecuentes</Typography>
-                  </MenuItem>
+                  {isAdmin ? (
+                    <MenuItem component={Link} href='/admin' onClick={handleDropdownClose}>
+                      <i className='ri-settings-3-line mie-2' />
+                      Datos y operaciones
+                    </MenuItem>
+                  ) : null}
                   <div className='flex items-center plb-2 pli-4'>
                     <Button
                       fullWidth
                       variant='contained'
-                      color='secondary'
+                      color='error'
                       size='small'
                       endIcon={<i className='ri-logout-box-r-line' />}
                       onClick={handleUserLogout}
                       sx={{ '& .MuiButton-endIcon': { marginInlineStart: 1.5 } }}
                     >
-                      Logout
+                      Cerrar sesión
                     </Button>
                   </div>
                 </MenuList>

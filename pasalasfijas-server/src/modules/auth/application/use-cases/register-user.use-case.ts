@@ -1,6 +1,8 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import { USER_REPOSITORY, UserRepository } from '../../../users/domain/repositories/user.repository'
+import { mapUserMe } from '../../../users/application/mappers/map-user-me'
+import { USER_REPOSITORY } from '../../../users/domain/repositories/user.repository'
+import type { UserRepository } from '../../../users/domain/repositories/user.repository'
 
 @Injectable()
 export class RegisterUserUseCase {
@@ -8,7 +10,7 @@ export class RegisterUserUseCase {
 
   async execute(input: { email: string; password: string; name?: string }) {
     const existingUser = await this.userRepository.findByEmail(input.email)
-    if (existingUser) throw new ConflictException('Email already registered')
+    if (existingUser) throw new ConflictException('Este correo ya está registrado')
 
     const passwordHash = await bcrypt.hash(input.password, 10)
     const user = await this.userRepository.create({
@@ -17,11 +19,9 @@ export class RegisterUserUseCase {
       name: input.name,
     })
 
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    }
+    const me = await this.userRepository.findByIdForMe(user.id)
+    if (!me) throw new ConflictException('No pudimos crear tu cuenta. Intenta de nuevo.')
+
+    return mapUserMe(me)
   }
 }

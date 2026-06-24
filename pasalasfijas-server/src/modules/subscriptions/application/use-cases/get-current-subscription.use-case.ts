@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { SUBSCRIPTION_REPOSITORY, SubscriptionRepository } from '../../domain/repositories/subscription.repository'
+import { SUBSCRIPTION_REPOSITORY, type SubscriptionRepository } from '../../domain/repositories/subscription.repository'
+import { mapSubscriptionMe } from '../mappers/map-subscription-me'
 
 @Injectable()
 export class GetCurrentSubscriptionUseCase {
@@ -7,7 +8,9 @@ export class GetCurrentSubscriptionUseCase {
     @Inject(SUBSCRIPTION_REPOSITORY) private readonly subscriptionRepository: SubscriptionRepository,
   ) {}
 
-  execute(userId: string) {
-    return this.subscriptionRepository.findActiveByUserId(userId)
+  async execute(userId: number) {
+    const subscription = await this.subscriptionRepository.findActiveByUserId(userId)
+
+    return mapSubscriptionMe(subscription)
   }
 }

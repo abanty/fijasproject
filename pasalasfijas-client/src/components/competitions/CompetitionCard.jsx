@@ -13,6 +13,7 @@ import RemixIcon from '@components/shared/RemixIcon'
 
 const CompetitionCard = ({ competition, matchCount }) => {
   const href = `/matches/${competition.slug}`
+  const hasBackground = Boolean(competition.cardBackgroundImage)
 
   const countLabel =
     competition.matchCountLabel ??
@@ -23,9 +24,21 @@ const CompetitionCard = ({ competition, matchCount }) => {
       component={Link}
       href={href}
       className={classnames('competition-card block no-underline text-inherit', {
-        'competition-card--featured': competition.featured
+        'competition-card--featured': competition.featured,
+        'competition-card--has-bg': hasBackground
       })}
     >
+      {hasBackground ? (
+        <>
+          <span
+            className='competition-card__bg'
+            style={{ backgroundImage: `url("${competition.cardBackgroundImage}")` }}
+            aria-hidden
+          />
+          <span className='competition-card__overlay' aria-hidden />
+        </>
+      ) : null}
+
       <CardContent className='competition-card__body flex flex-col gap-4 p-5 sm:p-6'>
         <div className='flex items-start gap-4'>
           <div className='competition-card__icon flex shrink-0 items-center justify-center'>
@@ -35,7 +48,11 @@ const CompetitionCard = ({ competition, matchCount }) => {
             <Typography variant='h6' className='competition-card__title font-semibold leading-snug'>
               {competition.title}
             </Typography>
-            <Typography variant='body2' color='text.secondary' className='leading-relaxed'>
+            <Typography
+              variant='body2'
+              color={hasBackground ? undefined : 'text.secondary'}
+              className='competition-card__description leading-relaxed'
+            >
               {competition.description}
             </Typography>
           </div>
@@ -51,7 +68,7 @@ const CompetitionCard = ({ competition, matchCount }) => {
             component='span'
             size='small'
             variant='text'
-            color={competition.featured ? 'primary' : 'inherit'}
+            color={hasBackground ? 'inherit' : competition.featured ? 'primary' : 'inherit'}
             className='competition-card__cta shrink-0'
             endIcon={<RemixIcon icon='ri-arrow-right-line' size='sm' />}
           >

@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../../../../shared/prisma/prisma.service'
+import { mapBankrollSummary } from '../mappers/map-bankroll-summary'
 
 @Injectable()
 export class CreateBankrollUseCase {
   constructor(private readonly prisma: PrismaService) {}
 
-  execute(userId: string, input: { initialAmount: number; currency?: string }) {
-    return this.prisma.userBankroll.upsert({
+  async execute(userId: number, input: { initialAmount: number; currency?: string }) {
+    const bankroll = await this.prisma.userBankroll.upsert({
       where: { userId },
       update: {
         initialAmount: input.initialAmount,
@@ -20,5 +21,9 @@ export class CreateBankrollUseCase {
         currency: input.currency ?? 'USD',
       },
     })
+
+    const trackings = await this.prisma.userBetTracking.findMany({ where: { userId } })
+
+    return mapBankrollSummary(bankroll, trackings)
   }
 }

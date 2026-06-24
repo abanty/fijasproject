@@ -18,6 +18,10 @@ export const MODE_SURFACE_KEYS = [
   'headerBgGradient'
 ]
 
+export const GRADIENT_SETTING_KEYS = new Set(
+  MODE_SURFACE_KEYS.filter(key => key.endsWith('Gradient'))
+)
+
 export const getDefaultThemeSettingsForMode = (mode = 'light') =>
   mode === 'dark' ? defaultDarkThemeSettings : defaultLightThemeSettings
 

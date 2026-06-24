@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import styled from '@emotion/styled'
 import classnames from 'classnames'
+import { useColorScheme } from '@mui/material/styles'
 
 import themeConfig from '@configs/themeConfig'
 
@@ -12,7 +13,10 @@ import { useSettings } from '@core/hooks/useSettings'
 
 const BRAND_BASE = 'Pasalas'
 const BRAND_ACCENT = 'Fijas'
-const BRAND_BASE_COLOR = '#F5F0E6' // crema del balón (no blanco puro)
+const BRAND_BASE_COLOR_DARK = '#F5F0E6'
+const BRAND_BASE_COLOR_LIGHT = '#3D3B45'
+const SHINE_HIGHLIGHT_DARK = '#fff0b8'
+const SHINE_HIGHLIGHT_LIGHT = '#ffffff'
 
 const LOGO_SIZES = {
   default: { ball: 32, fontSize: '1.375rem', minBlock: 32 },
@@ -25,12 +29,12 @@ const BALL_SPIN_DEG = 180
 const BALL_SPIN_SHINE_LEAD_MS = 350
 const WORDMARK_SHINE_MS = 700
 
-const wordShineStyles = baseColor => `
+const wordShineStyles = (baseColor, highlightColor) => `
   background-image: linear-gradient(
     90deg,
     ${baseColor} 0%,
     ${baseColor} 42%,
-    #fff0b8 50%,
+    ${highlightColor} 50%,
     ${baseColor} 58%,
     ${baseColor} 100%
   );
@@ -90,9 +94,17 @@ const LogoWordmark = styled.span`
 `
 
 const LogoWordBase = styled.span`
-  color: ${({ color }) => color ?? BRAND_BASE_COLOR};
+  color: ${({ color }) => color};
 
-  ${({ $isShining, color }) => $isShining && wordShineStyles(color ?? BRAND_BASE_COLOR)}
+  ${({ $isLight, color, $isShining }) =>
+    $isLight &&
+    !$isShining &&
+    `
+      text-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);
+    `}
+
+  ${({ $isShining, color, $shineHighlight }) =>
+    $isShining && wordShineStyles(color, $shineHighlight)}
 `
 
 const LogoWordAccent = styled.span`
@@ -100,10 +112,10 @@ const LogoWordAccent = styled.span`
   text-shadow: 0 0 18px color-mix(in srgb, ${({ $accentColor }) => $accentColor} 35%, transparent);
   transition: color 200ms ease, text-shadow 200ms ease;
 
-  ${({ $isShining, $accentColor }) =>
+  ${({ $isShining, $accentColor, $shineHighlight }) =>
     $isShining &&
     `
-      ${wordShineStyles($accentColor)}
+      ${wordShineStyles($accentColor, $shineHighlight)}
       text-shadow: none;
     `}
 `
@@ -119,8 +131,12 @@ const Logo = ({ color, size = 'default' }) => {
   const [isWordmarkShining, setIsWordmarkShining] = useState(false)
   const { isHovered, transitionDuration, isBreakpointReached } = useVerticalNav()
   const { settings } = useSettings()
+  const { mode: colorSchemeMode } = useColorScheme()
   const { layout } = settings
   const logoSize = LOGO_SIZES[size] ?? LOGO_SIZES.default
+  const isDarkMode = (colorSchemeMode ?? settings.mode ?? 'dark') === 'dark'
+  const brandBaseColor = color ?? (isDarkMode ? BRAND_BASE_COLOR_DARK : BRAND_BASE_COLOR_LIGHT)
+  const shineHighlight = isDarkMode ? SHINE_HIGHLIGHT_DARK : SHINE_HIGHLIGHT_LIGHT
 
   const startSpinning = () => {
     if (bounceFallbackRef.current) {
@@ -258,10 +274,19 @@ const Logo = ({ color, size = 'default' }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        <LogoWordBase color={color} $isShining={isWordmarkShining}>
+        <LogoWordBase
+          color={brandBaseColor}
+          $isLight={!isDarkMode}
+          $shineHighlight={shineHighlight}
+          $isShining={isWordmarkShining}
+        >
           {BRAND_BASE}
         </LogoWordBase>
-        <LogoWordAccent $accentColor={settings.primaryColor} $isShining={isWordmarkShining}>
+        <LogoWordAccent
+          $accentColor={settings.primaryColor}
+          $shineHighlight={shineHighlight}
+          $isShining={isWordmarkShining}
+        >
           {BRAND_ACCENT}
         </LogoWordAccent>
       </LogoWordmark>
