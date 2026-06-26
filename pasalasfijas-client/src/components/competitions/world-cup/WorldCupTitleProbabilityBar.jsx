@@ -1,120 +1,93 @@
 'use client'
 
-import Box from '@mui/material/Box'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Typography from '@mui/material/Typography'
+import { useState } from 'react'
+
+import IconButton from '@mui/material/IconButton'
 
 import Link from '@components/Link'
 import RemixIcon from '@components/shared/RemixIcon'
 import CountryFlag from '@/components/shared/CountryFlag'
 import { worldCupTitleProbabilities } from '@/data/competitions/worldCupHub'
 
-const TOP_COUNT = 5
+const SESSION_KEY = 'pasalasfijas:wc-title-prob-bar-dismissed'
+
+const readDismissed = () => {
+  if (typeof window === 'undefined') return false
+
+  try {
+    window.localStorage.removeItem(SESSION_KEY)
+
+    return window.sessionStorage.getItem(SESSION_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+const formatPercent = value => {
+  const rounded = Math.round(value * 10) / 10
+
+  return Number.isInteger(rounded) ? `${rounded}%` : `${rounded.toFixed(1)}%`
+}
 
 const WorldCupTitleProbabilityBar = () => {
-  const topTeams = worldCupTitleProbabilities.slice(0, TOP_COUNT)
-  const maxValue = topTeams[0]?.value ?? 1
+  const [dismissed, setDismissed] = useState(readDismissed)
+
+  const handleDismiss = () => {
+    setDismissed(true)
+
+    try {
+      window.sessionStorage.setItem(SESSION_KEY, '1')
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (dismissed) return null
+
+  const renderSequence = (suffix, { hidden = false } = {}) => (
+    <>
+      {worldCupTitleProbabilities.map(item => (
+        <span
+          key={`${item.code}${suffix}`}
+          className='world-cup-title-prob-bar__item'
+          aria-hidden={hidden || undefined}
+        >
+          <CountryFlag code={item.code} size={14} variant='sphere' />
+          <span className='world-cup-title-prob-bar__item-name'>{item.name}</span>
+          <span className='world-cup-title-prob-bar__item-pct'>{formatPercent(item.value)}</span>
+        </span>
+      ))}
+      <span className='world-cup-title-prob-bar__gap' aria-hidden />
+    </>
+  )
 
   return (
-    <Card variant='outlined' sx={{ mb: 3, mt: 0.75 }}>
-      <CardContent
-        sx={{
-          py: 3.25,
-          px: { xs: 2.5, md: 4 },
-          '&:last-child': { pb: 3.25 }
-        }}
+    <div className='world-cup-title-prob-bar'>
+      <div className='world-cup-title-prob-bar__lead'>
+        <RemixIcon icon='ri-trophy-line' size='sm' className='world-cup-title-prob-bar__icon' />
+        <span className='world-cup-title-prob-bar__label'>Probabilidad de título</span>
+      </div>
+
+      <div className='world-cup-title-prob-bar__marquee'>
+        <div className='world-cup-title-prob-bar__marquee-track'>
+          {renderSequence('-a')}
+          {renderSequence('-b', { hidden: true })}
+        </div>
+      </div>
+
+      <Link href='/predictions' className='world-cup-title-prob-bar__cta'>
+        Haz tu pronóstico →
+      </Link>
+
+      <IconButton
+        size='small'
+        aria-label='Cerrar'
+        onClick={handleDismiss}
+        className='world-cup-title-prob-bar__close'
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            gap: { xs: 2, md: 2.5 },
-            width: '100%',
-            minWidth: 0
-          }}
-        >
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.75,
-              flexShrink: 0,
-              color: 'primary.main'
-            }}
-          >
-            <RemixIcon icon='ri-trophy-line' size='md' />
-            <Typography variant='body2' fontWeight={600} sx={{ whiteSpace: 'nowrap', color: 'text.secondary' }}>
-              Probabilidad de título
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              gap: { xs: 2, md: 2.75 },
-              flex: 1,
-              minWidth: 0,
-              overflowX: 'auto',
-              flexWrap: 'nowrap',
-              scrollbarWidth: 'none',
-              '&::-webkit-scrollbar': { display: 'none' }
-            }}
-          >
-            {topTeams.map(item => (
-              <Box
-                key={item.code}
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  flexShrink: 0
-                }}
-              >
-                <CountryFlag code={item.code} size={18} variant='sphere' />
-                <Typography variant='caption' fontWeight={700} color='text.secondary' sx={{ minWidth: 26 }}>
-                  {item.label}
-                </Typography>
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 5,
-                    borderRadius: 999,
-                    bgcolor: 'action.hover',
-                    overflow: 'hidden',
-                    flexShrink: 0
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: '100%',
-                      width: `${(item.value / maxValue) * 100}%`,
-                      borderRadius: 999,
-                      bgcolor: 'primary.main'
-                    }}
-                  />
-                </Box>
-                <Typography variant='caption' color='text.secondary' sx={{ minWidth: 34, textAlign: 'right' }}>
-                  {item.value}%
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-          <Box sx={{ flexShrink: 0, ml: 'auto' }}>
-            <Link
-              href='/predictions'
-              className='text-primary font-semibold text-sm whitespace-nowrap no-underline hover:underline'
-            >
-              Haz tu pronóstico →
-            </Link>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
+        <RemixIcon icon='ri-close-line' size='sm' />
+      </IconButton>
+    </div>
   )
 }
 

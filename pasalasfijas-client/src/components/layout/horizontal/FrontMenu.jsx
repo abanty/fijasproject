@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
+import Box from '@mui/material/Box'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import Fade from '@mui/material/Fade'
 import MenuItem from '@mui/material/MenuItem'
@@ -22,6 +23,8 @@ import { useSettings } from '@core/hooks/useSettings'
 import horizontalMenuData from '@/data/navigation/horizontalMenuData'
 
 import { isNavActive, isNavGroupActive } from '@/lib/navigation/isNavActive'
+
+const navTabLabel = item => item.shortLabel ?? item.label
 
 const HeaderNavLink = ({ item, pathname }) => {
   const isActive = isNavActive(pathname, item.href)
@@ -50,7 +53,33 @@ const HeaderNavLink = ({ item, pathname }) => {
   )
 }
 
-const HeaderNavGroup = ({ item, pathname }) => {
+const HeaderNavTab = ({ item, pathname }) => {
+  const isActive = isNavActive(pathname, item.href)
+  const highlightText = item.highlight?.badge ?? item.highlight?.label
+  const ariaLabel = highlightText ? `${item.label}, ${highlightText}` : item.label
+
+  return (
+    <Box
+      component={Link}
+      href={item.href}
+      aria-label={ariaLabel}
+      aria-current={isActive ? 'page' : undefined}
+      className={classnames('header-nav-tab', {
+        'header-nav-tab--active': isActive,
+        'header-nav-tab--badged': item.highlight
+      })}
+    >
+      <NavItemBadge highlight={item.highlight}>
+        <span className='header-nav-tab__icon'>
+          <RemixIcon icon={item.icon} size='md' />
+        </span>
+        <span className='header-nav-tab__label'>{navTabLabel(item)}</span>
+      </NavItemBadge>
+    </Box>
+  )
+}
+
+const HeaderNavGroup = ({ item, pathname, mobile = false }) => {
   const anchorRef = useRef(null)
   const [open, setOpen] = useState(false)
   const { settings } = useSettings()
@@ -61,6 +90,84 @@ const HeaderNavGroup = ({ item, pathname }) => {
   const handleClose = event => {
     if (anchorRef.current?.contains(event?.target)) return
     setOpen(false)
+  }
+
+  const dropdown = (
+    <Popper
+      open={open}
+      transition
+      disablePortal
+      placement={mobile ? 'bottom' : 'bottom-start'}
+      anchorEl={anchorRef.current}
+      modifiers={[{ name: 'offset', options: { offset: [0, mobile ? 8 : 10] } }]}
+      className='header-nav-dropdown z-[1300]'
+    >
+      {({ TransitionProps, placement }) => (
+        <Fade
+          {...TransitionProps}
+          style={{
+            transformOrigin: mobile
+              ? placement === 'bottom'
+                ? 'center top'
+                : 'center bottom'
+              : placement === 'bottom-start'
+                ? 'left top'
+                : 'right top'
+          }}
+        >
+          <Paper
+            elevation={settings.skin === 'bordered' ? 0 : 10}
+            className={classnames(
+              'header-nav-dropdown-paper',
+              settings.skin === 'bordered' && 'border shadow-none'
+            )}
+          >
+            <ClickAwayListener onClickAway={handleClose}>
+              <MenuList className='header-nav-dropdown-list'>
+                {item.children.map(child => (
+                  <MenuItem
+                    key={child.href}
+                    component={Link}
+                    href={child.href}
+                    onClick={() => setOpen(false)}
+                    selected={isNavActive(pathname, child.href)}
+                    className='header-nav-dropdown-item gap-3'
+                  >
+                    <RemixIcon icon={child.icon} size='md' />
+                    {child.label}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </ClickAwayListener>
+          </Paper>
+        </Fade>
+      )}
+    </Popper>
+  )
+
+  if (mobile) {
+    return (
+      <>
+        <Box
+          ref={anchorRef}
+          component='button'
+          type='button'
+          aria-haspopup='menu'
+          aria-expanded={open}
+          aria-label={item.label}
+          onClick={handleToggle}
+          className={classnames('header-nav-tab', {
+            'header-nav-tab--active': isActive || open
+          })}
+        >
+          <span className='header-nav-tab__icon'>
+            <RemixIcon icon={item.icon} size='md' />
+          </span>
+          <span className='header-nav-tab__label'>{navTabLabel(item)}</span>
+        </Box>
+        {dropdown}
+      </>
+    )
   }
 
   return (
@@ -82,48 +189,7 @@ const HeaderNavGroup = ({ item, pathname }) => {
         {item.label}
         <i className={classnames('ri-arrow-down-s-line text-lg transition-transform', { 'rotate-180': open })} />
       </Typography>
-      <Popper
-        open={open}
-        transition
-        disablePortal
-        placement='bottom-start'
-        anchorEl={anchorRef.current}
-        modifiers={[{ name: 'offset', options: { offset: [0, 10] } }]}
-        className='header-nav-dropdown z-[1300]'
-      >
-        {({ TransitionProps, placement }) => (
-          <Fade
-            {...TransitionProps}
-            style={{ transformOrigin: placement === 'bottom-start' ? 'left top' : 'right top' }}
-          >
-            <Paper
-              elevation={settings.skin === 'bordered' ? 0 : 10}
-              className={classnames(
-                'header-nav-dropdown-paper',
-                settings.skin === 'bordered' && 'border shadow-none'
-              )}
-            >
-              <ClickAwayListener onClickAway={handleClose}>
-                <MenuList className='header-nav-dropdown-list'>
-                  {item.children.map(child => (
-                    <MenuItem
-                      key={child.href}
-                      component={Link}
-                      href={child.href}
-                      onClick={() => setOpen(false)}
-                      selected={isNavActive(pathname, child.href)}
-                      className='header-nav-dropdown-item gap-3'
-                    >
-                      <RemixIcon icon={child.icon} size='md' />
-                      {child.label}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
+      {dropdown}
     </>
   )
 }
@@ -133,15 +199,31 @@ const FrontMenu = () => {
   const items = horizontalMenuData()
 
   return (
-    <div className='header-nav-row flex items-center flex-wrap gap-x-6 gap-y-3'>
-      {items.map(item =>
-        item.children?.length ? (
-          <HeaderNavGroup key={item.id} item={item} pathname={pathname} />
-        ) : (
-          <HeaderNavLink key={item.href} item={item} pathname={pathname} />
-        )
-      )}
-    </div>
+    <>
+      <div className='header-nav-row header-viewport-desktop-only flex items-center flex-wrap gap-x-6 gap-y-3'>
+        {items.map(item =>
+          item.children?.length ? (
+            <HeaderNavGroup key={item.id} item={item} pathname={pathname} />
+          ) : (
+            <HeaderNavLink key={item.id} item={item} pathname={pathname} />
+          )
+        )}
+      </div>
+
+      <div
+        className='header-nav-tab-row header-viewport-mobile-only'
+        role='navigation'
+        aria-label='Secciones'
+      >
+        {items.map(item =>
+          item.children?.length ? (
+            <HeaderNavGroup key={item.id} item={item} pathname={pathname} mobile />
+          ) : (
+            <HeaderNavTab key={item.id} item={item} pathname={pathname} />
+          )
+        )}
+      </div>
+    </>
   )
 }
 

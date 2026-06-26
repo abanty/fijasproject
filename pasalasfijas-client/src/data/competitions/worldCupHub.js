@@ -13,14 +13,14 @@ export const worldCupTabs = [
 ]
 
 export const worldCupTitleProbabilities = [
-  { code: 'ES', label: 'ESP', value: 22.4 },
-  { code: 'FR', label: 'FRA', value: 17.4 },
-  { code: 'BR', label: 'BRA', value: 14.2 },
-  { code: 'AR', label: 'ARG', value: 12.8 },
-  { code: 'DE', label: 'GER', value: 9.6 },
-  { code: 'GB', label: 'ENG', value: 8.1 },
-  { code: 'US', label: 'USA', value: 6.3 },
-  { code: 'MX', label: 'MEX', value: 5.2 }
+  { code: 'AR', name: 'Argentina', value: 23 },
+  { code: 'ES', name: 'España', value: 16.8 },
+  { code: 'FR', name: 'Francia', value: 14.4 },
+  { code: 'GB', name: 'Inglaterra', value: 8.8 },
+  { code: 'BR', name: 'Brasil', value: 5.7 },
+  { code: 'DE', name: 'Alemania', value: 5.1 },
+  { code: 'US', name: 'EE.UU.', value: 4.2 },
+  { code: 'MX', name: 'México', value: 3.6 }
 ]
 
 export const worldCupQuickFilters = [

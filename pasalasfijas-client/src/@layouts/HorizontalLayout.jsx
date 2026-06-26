@@ -7,6 +7,7 @@ import { HorizontalNavProvider } from '@menu/contexts/horizontalNavContext'
 // Component Imports
 import LayoutContent from './components/horizontal/LayoutContent'
 import AppBodyShell from '@components/layout/shared/AppBodyShell'
+import AppScrollRoot from '@components/layout/shared/AppScrollRoot'
 import HeaderHeightSync from '@components/layout/shared/HeaderHeightSync'
 
 // Context Imports
@@ -23,17 +24,24 @@ const HorizontalLayout = props => {
   const { header, footer, children } = props
 
   return (
-    <div className={classnames(horizontalLayoutClasses.root, 'flex flex-auto')}>
+    <div
+      className={classnames(horizontalLayoutClasses.root, 'flex flex-col flex-auto min-bs-0 is-full')}
+      data-header-scroll-mode='isolated'
+    >
       <HorizontalNavProvider>
         <SidebarNavProvider>
-          <StyledContentWrapper className={classnames(horizontalLayoutClasses.contentWrapper, 'flex flex-col is-full')}>
-            <HeaderHeightSync />
-            {header || null}
-            <AppBodyShell>
-              <LayoutContent>{children}</LayoutContent>
-            </AppBodyShell>
-            {/* {footer || null} (No se muestra el footer en la versión horizontal) */}
-          </StyledContentWrapper>
+          <HeaderHeightSync />
+          {header || null}
+          <AppScrollRoot>
+            <StyledContentWrapper
+              className={classnames(horizontalLayoutClasses.contentWrapper, 'flex flex-col flex-auto min-bs-0 is-full')}
+            >
+              <AppBodyShell>
+                <LayoutContent>{children}</LayoutContent>
+              </AppBodyShell>
+              {/* {footer || null} (No se muestra el footer en la versión horizontal) */}
+            </StyledContentWrapper>
+          </AppScrollRoot>
         </SidebarNavProvider>
       </HorizontalNavProvider>
     </div>

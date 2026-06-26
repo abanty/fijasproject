@@ -55,14 +55,21 @@ const WorldCupHubPage = ({ competition }) => {
   const activeTabMeta = worldCupTabs.find(tab => tab.id === activeTab)
 
   return (
-    <Stack spacing={3} className='page-stack'>
+    <Stack spacing={0} className='page-stack world-cup-hub-page' sx={{ minWidth: 0, width: '100%' }}>
       <Button
         component={Link}
         href='/matches'
         size='small'
         variant='text'
+        className='world-cup-hub-back'
         startIcon={<RemixIcon icon='ri-arrow-left-line' size='sm' />}
-        sx={{ alignSelf: 'flex-start', ml: -1 }}
+        sx={{
+          alignSelf: 'flex-start',
+          ml: { xs: -0.5, md: -1 },
+          py: 0,
+          px: { xs: 0.5, md: 1 },
+          minHeight: { xs: 28, md: 36 }
+        }}
       >
         Torneos activos
       </Button>

@@ -15,6 +15,7 @@
   --header-navbar-height: 52px;
   --header-top-height: 52px;
   --header-nav-height: 44px;
+  --mobile-bottom-nav-height: 56px;
   --header-padding-block: 4px;
   --header-sticky-offset: 10px;
   --layout-padding: 20px;
@@ -31,6 +32,7 @@
   --nav-highlight-badge-anchor-padding-inline-end: 10px;
   --nav-highlight-badge-band-padding-block-start: 0px;
   --header-actions-reserve: 5.5rem;
+  --header-content-inline-size: calc(100% - (2 * var(--layout-padding)));
   --sidebar-bg: var(--mui-palette-background-paper);
   --app-sidebar-nav-scroll-padding-inline-end: 0;
   --app-sidebar-nav-item-margin-inline-end: 0.5rem;
@@ -45,6 +47,12 @@
   --search-z-index: var(--mui-zIndex-tooltip);
   --drawer-z-index: var(--mui-zIndex-drawer);
   --backdrop-color: rgb(var(--mui-mainColorChannels-light) / 0.5);
+  --mobile-more-backdrop-color: rgb(0 0 0 / 0.36);
+  --mobile-more-sheet-bg: var(--mui-palette-background-paper);
+  --header-surface-bg: var(--mui-palette-background-paper);
+  --header-surface-bg-image: none;
+  --header-surface-bg-gradient: none;
+  --header-surface-backdrop: none;
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-lightShadow);
 }
 
@@ -63,12 +71,20 @@
 }
 
 [data-dark] {
-  --backdrop-color: rgb(21 16 43 / 0.6);
+  --backdrop-color: rgb(0 0 0 / 0.5);
+  --mobile-more-backdrop-color: rgb(0 0 0 / 0.4);
+  --mobile-more-sheet-bg: color-mix(
+    in srgb,
+    var(--theme-paper-bg-solid, var(--mui-palette-background-paper)) 86%,
+    black 14%
+  );
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-darkShadow);
 }
 
 [data-theme-preset='world-cup'][data-dark] {
-  --backdrop-color: rgb(7 14 18 / 0.92);
+  --backdrop-color: rgb(0 0 0 / 0.5);
+  --mobile-more-backdrop-color: rgb(0 0 0 / 0.44);
+  --mobile-more-sheet-bg: color-mix(in srgb, var(--theme-paper-bg-solid, #121e26) 82%, black 18%);
   --primary-color: var(--mui-palette-primary-main, #e02020);
   --sidebar-bg: var(--theme-sidebar-bg, #121e26);
 }
@@ -98,6 +114,10 @@ body {
   min-block-size: 0;
   block-size: 100dvh;
   max-block-size: 100dvh;
+  /* overflow-y:auto: scrollport nativo para que position:sticky del header funcione (PS usa hidden) */
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 [data-body-bg-image='on'] body {
@@ -248,10 +268,31 @@ html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup
   opacity: 1;
 }
 
-.ts-vertical-layout-header,
-.ts-horizontal-layout-header {
+.ts-vertical-layout-header:not(.ts-vertical-layout-header-fixed),
+.ts-horizontal-layout-header:not(.ts-horizontal-layout-header-fixed) {
   position: relative;
   overflow: visible;
+}
+
+.ts-vertical-layout-header.ts-vertical-layout-header-fixed,
+.ts-horizontal-layout-header.ts-horizontal-layout-header-fixed {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: var(--header-z-index);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Horizontal: header fuera del scroll — no usar sticky (evita jitter con PerfectScrollbar) */
+[data-header-scroll-mode='isolated'] .ts-horizontal-layout-header.ts-horizontal-layout-header-fixed {
+  position: relative;
+  inset-block-start: auto;
+  flex-shrink: 0;
+}
+
+[data-header-scroll-mode='isolated'] .app-sidebar,
+[data-header-scroll-mode='isolated'] .app-right-panel {
+  inset-block-start: var(--header-sticky-offset);
 }
 
 .ts-vertical-layout-navbar,
@@ -262,11 +303,60 @@ html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup
   padding-inline: var(--layout-padding);
 }
 
-.ts-horizontal-layout-navigation {
-  min-block-size: var(--header-nav-height);
-  overflow: visible;
-  padding-block-start: var(--nav-highlight-badge-band-padding-block-start);
-  box-sizing: border-box;
+/* Visibilidad por viewport sin JS — menú header (el buscador va por SSR mobile-first, no duplicado) */
+.header-viewport-desktop-only {
+  display: none;
+}
+
+html[data-nav-viewport='desktop'] .header-viewport-desktop-only {
+  display: revert;
+}
+
+html[data-nav-viewport='desktop'] .header-viewport-mobile-only {
+  display: none !important;
+}
+
+@media (min-width: 1200px) {
+  .header-viewport-desktop-only {
+    display: revert;
+  }
+
+  .header-viewport-mobile-only {
+    display: none !important;
+  }
+}
+
+.wc-viewport-desktop-only {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .wc-viewport-desktop-only {
+    display: flex;
+  }
+
+  .wc-viewport-mobile-only {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .ts-horizontal-layout-navigation {
+    min-block-size: var(--header-nav-height);
+    overflow: visible;
+    padding-block-start: var(--nav-highlight-badge-band-padding-block-start);
+    box-sizing: border-box;
+  }
+
+  .header-nav-band__inner--adaptive {
+    padding-inline: var(--layout-padding);
+    padding-block: 0;
+  }
+
+  .header-nav-band__inner--adaptive.header-nav-band__inner--compact {
+    margin-inline: auto;
+    max-inline-size: var(--body-shell-max-width, 1440px);
+  }
 }
 
 .ts-horizontal-layout-navigation-content-wrapper,
@@ -275,16 +365,19 @@ html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup
   overflow: visible;
 }
 
+.ts-horizontal-layout-header.ts-horizontal-layout-header-blur {
+  --header-surface-bg: rgb(var(--mui-palette-background-paperChannel) / 0.85);
+  --header-surface-backdrop: blur(9px);
+}
+
 .header-nav-band--detached {
-  position: sticky;
-  inset-block-start: var(--header-navbar-height, var(--header-top-height));
+  position: relative;
   z-index: calc(var(--header-z-index) - 1);
-  background-color: var(--mui-palette-background-paper);
 }
 
 .header-nav-band--detached.header-nav-band {
-  padding-inline: var(--layout-padding);
-  padding-block-start: var(--nav-highlight-badge-band-padding-block-start);
+  padding-inline: 0;
+  padding-block: 0;
 }
 
 .header-nav-dropdown {
@@ -404,8 +497,12 @@ html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup
 [data-header-bg='custom'] .ts-horizontal-layout-header,
 [data-header-bg-image='on'] .ts-vertical-layout-header,
 [data-header-bg-image='on'] .ts-horizontal-layout-header {
-  background-color: var(--header-bg-solid, var(--mui-palette-background-paper)) !important;
-  background-image: var(--header-bg-image, none), var(--header-bg-gradient-layer, none) !important;
+  --header-surface-bg: var(--header-bg-solid, var(--mui-palette-background-paper));
+  --header-surface-bg-image: var(--header-bg-image, none);
+  --header-surface-bg-gradient: var(--header-bg-gradient-layer, none);
+  --header-surface-backdrop: none;
+  background-color: var(--header-surface-bg) !important;
+  background-image: var(--header-surface-bg-image), var(--header-surface-bg-gradient) !important;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -533,10 +630,11 @@ html .MuiCard-root:not(.auth-card):not(.competition-card--has-bg):not(.world-cup
 }
 
 [data-body-shell-width='boxed'] .ts-horizontal-layout-header .ts-horizontal-layout-navbar,
+[data-body-shell-width='boxed'] .ts-horizontal-layout-header .header-nav-band--detached,
 [data-body-shell-width='boxed'] .ts-horizontal-layout-footer .ts-horizontal-layout-footer-content-wrapper {
   margin-inline: auto;
   max-inline-size: var(--body-shell-max-width, 1440px);
-  inline-size: calc(100% - (2 * var(--layout-padding)));
+  inline-size: var(--header-content-inline-size);
 }
 
 .country-flag-asset {
@@ -696,12 +794,6 @@ html:not([data-dark]) .country-flag-asset-frame .country-flag-asset {
 @media (min-width: 1280px) {
   [data-right-panel='on'] .header-search-slot {
     inset-inline-end: var(--right-panel-width);
-  }
-}
-
-@media (max-width: 1023px) {
-  .header-search-slot {
-    inset-inline-start: 2.75rem;
   }
 }
 
@@ -2075,8 +2167,355 @@ code {
   color: var(--mui-palette-info-main);
 }
 
-.world-cup-hub-tabs .MuiTabs-root ~ .MuiTabPanel-root {
-  padding-block-start: 0;
+.world-cup-hub-page,
+.world-cup-hub-tabs {
+  min-inline-size: 0;
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+.world-cup-hub-tabs .MuiTabPanel-root {
+  padding: 0;
+}
+
+.world-cup-hub-tab-scroll {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  scrollbar-width: none;
+  border-block-end: 1px solid var(--mui-palette-divider);
+}
+
+.world-cup-hub-tab-track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  inline-size: max-content;
+  min-inline-size: 100%;
+}
+
+.world-cup-hub-tab-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.world-cup-hub-tab {
+  flex: 0 0 auto;
+  appearance: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--mui-palette-text-secondary);
+  padding: 0.625rem 0.875rem;
+  margin-block-end: -1px;
+  border-block-end: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.world-cup-hub-tab--active {
+  color: var(--mui-palette-primary-main);
+  border-block-end-color: var(--mui-palette-primary-main);
+}
+
+.world-cup-hub-tab:hover,
+.world-cup-hub-tab:focus-visible {
+  color: var(--mui-palette-primary-main);
+  outline: none;
+}
+
+@media (min-width: 900px) {
+  .world-cup-hub-page.page-stack {
+    gap: 1.5rem;
+  }
+
+  .world-cup-hub-tab {
+    font-size: 0.875rem;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .world-cup-matches-tab {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 899px) {
+  .app-body-shell:has(.world-cup-hub-page) {
+    padding-block-start: 0;
+  }
+
+  .app-main-content > .ts-horizontal-layout-content:has(.world-cup-hub-page) {
+    padding-block-start: 1rem;
+  }
+
+  .world-cup-hub-page.page-stack {
+    gap: 0.625rem;
+  }
+
+  .world-cup-hub-back {
+    font-size: 0.8125rem;
+    margin-block-end: 0;
+  }
+
+  .world-cup-hub-tabs {
+    margin-block-start: 0.375rem;
+  }
+
+  .world-cup-hub-tabs .MuiTabPanel-root {
+    padding-block-start: 1rem;
+  }
+
+  .world-cup-matches-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.125rem;
+    margin-inline: auto;
+    padding-inline: 10px;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    box-sizing: border-box;
+  }
+
+  .world-cup-matches-tab > * {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .world-cup-matches-tab__header {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center;
+    gap: 0.75rem !important;
+  }
+
+  .world-cup-matches-tab__header > .MuiStack-root {
+    align-items: center;
+  }
+
+  .world-cup-matches-tab__day-group {
+    margin-block-end: 0.5rem;
+    text-align: center;
+  }
+
+  .world-cup-matches-tab__day-group:last-child {
+    margin-block-end: 0;
+  }
+
+  .world-cup-quick-filters-scroll {
+    display: flex;
+    justify-content: center;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .world-cup-quick-filters-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .world-cup-hub-tab-scroll {
+    margin-inline: calc(var(--app-column-padding-inline, 16px) * 0);
+    padding-inline: 0px;
+  }
+
+  .world-cup-quick-filters-scroll .world-cup-quick-filters {
+    flex-wrap: nowrap;
+    inline-size: max-content;
+    max-inline-size: 100%;
+    margin-inline: auto;
+    justify-content: center;
+  }
+}
+
+.world-cup-filters-drawer .world-cup-filters-drawer__paper {
+  border-start-start-radius: 1rem;
+  border-start-end-radius: 1rem;
+  max-height: min(88dvh, 640px);
+}
+
+.world-cup-filters-drawer__handle {
+  inline-size: 2.5rem;
+  block-size: 0.25rem;
+  margin: 0.625rem auto 0;
+  border-radius: 999px;
+  background-color: var(--mui-palette-divider);
+}
+
+.world-cup-title-prob-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-block: 0.375rem 0.75rem;
+  padding: 0.3125rem 0.375rem 0.3125rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--mui-palette-primary-mainChannel) / 0.22);
+  background: rgb(var(--mui-palette-primary-mainChannel) / 0.1);
+  min-inline-size: 0;
+  inline-size: 100%;
+  max-block-size: 2rem;
+  overflow: hidden;
+}
+
+.world-cup-title-prob-bar__lead {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 0 0 auto;
+  color: var(--mui-palette-text-primary);
+  padding-inline-end: 0.5rem;
+  border-inline-end: 1px solid var(--mui-palette-divider);
+}
+
+.world-cup-title-prob-bar__icon {
+  color: var(--mui-palette-primary-main);
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.world-cup-title-prob-bar__label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.world-cup-title-prob-bar__cta {
+  flex: 0 0 auto;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--mui-palette-primary-main);
+  text-decoration: none;
+  white-space: nowrap;
+  padding-inline-start: 0.375rem;
+  border-inline-start: 1px solid var(--mui-palette-divider);
+}
+
+.world-cup-title-prob-bar__marquee {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  block-size: 1.25rem;
+}
+
+.world-cup-title-prob-bar__marquee-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  inline-size: max-content;
+  block-size: 100%;
+  animation: world-cup-prob-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.world-cup-title-prob-bar__marquee-track:hover,
+.world-cup-title-prob-bar__marquee-track:focus-within {
+  animation-play-state: paused;
+}
+
+.world-cup-title-prob-bar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: var(--mui-palette-text-primary);
+}
+
+.world-cup-title-prob-bar__item-name {
+  font-weight: 600;
+}
+
+.world-cup-title-prob-bar__item-pct {
+  font-weight: 700;
+  color: var(--mui-palette-text-secondary);
+}
+
+.world-cup-title-prob-bar__cta:hover {
+  text-decoration: underline;
+}
+
+.world-cup-title-prob-bar__gap {
+  flex: 0 0 1.25rem;
+  inline-size: 1.25rem;
+}
+
+.world-cup-title-prob-bar__close {
+  flex: 0 0 auto;
+  margin-inline: -0.125rem;
+  padding: 0.25rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+@keyframes world-cup-prob-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 899px) {
+  .world-cup-title-prob-bar {
+    display: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .world-cup-title-prob-bar {
+    max-block-size: 2.25rem;
+    padding: 0.375rem 0.5rem 0.375rem 0.625rem;
+    gap: 0.625rem;
+  }
+
+  .world-cup-title-prob-bar__marquee {
+    block-size: 1.375rem;
+  }
+
+  .world-cup-title-prob-bar__item,
+  .world-cup-title-prob-bar__cta {
+    font-size: 0.75rem;
+    line-height: 1.375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-cup-title-prob-bar__marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scrollbar-width: none;
+  }
+
+  .world-cup-title-prob-bar__marquee::-webkit-scrollbar {
+    display: none;
+  }
+
+  .world-cup-title-prob-bar__marquee-track {
+    animation: none;
+  }
 }
 
 .world-cup-match-card {
@@ -2084,15 +2523,22 @@ code {
   overflow: hidden;
   border-radius: 1.25rem;
   border: none;
-  box-shadow: none;
   cursor: pointer;
   transition:
     box-shadow 0.2s ease,
     transform 0.2s ease;
 }
 
-.world-cup-match-card.MuiPaper-outlined {
-  border: none;
+.world-cup-match-card:not(.world-cup-match-card--has-bg) {
+  box-shadow:
+    0 1px 2px rgb(var(--mui-mainColorChannels-shadow) / 0.05),
+    0 4px 12px rgb(var(--mui-mainColorChannels-shadow) / 0.06);
+}
+
+[data-dark] .world-cup-match-card:not(.world-cup-match-card--has-bg) {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.16),
+    0 4px 14px rgb(0 0 0 / 0.2);
 }
 
 .world-cup-match-card--has-bg {
@@ -2101,6 +2547,10 @@ code {
   background-color: transparent;
   background-image: none;
   color: #fff;
+}
+
+.world-cup-match-card.MuiPaper-outlined {
+  border: none;
 }
 
 .world-cup-match-card__media {
@@ -2210,7 +2660,9 @@ code {
 
 .world-cup-match-card:not(.world-cup-match-card--has-bg):hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgb(var(--mui-mainColorChannels-shadow) / 0.1);
+  box-shadow:
+    0 2px 4px rgb(var(--mui-mainColorChannels-shadow) / 0.06),
+    0 10px 22px rgb(var(--mui-mainColorChannels-shadow) / 0.1);
 }
 
 .world-cup-match-card:not(.world-cup-match-card--has-bg):hover::after {
@@ -2218,7 +2670,9 @@ code {
 }
 
 [data-dark] .world-cup-match-card:not(.world-cup-match-card--has-bg):hover {
-  box-shadow: 0 10px 28px rgb(0 0 0 / 0.22);
+  box-shadow:
+    0 2px 6px rgb(0 0 0 / 0.2),
+    0 12px 26px rgb(0 0 0 / 0.28);
 }
 
 [data-dark] .world-cup-match-card:not(.world-cup-match-card--has-bg):hover::after {
@@ -2234,6 +2688,395 @@ code {
   background:
     linear-gradient(160deg, rgb(4 8 16 / 0.96) 0%, rgb(4 8 16 / 0.88) 52%, rgb(4 8 16 / 0.98) 100%),
     linear-gradient(to top, rgb(0 0 0 / 0.58) 0%, transparent 58%);
+}
+
+@media (max-width: 1199px) {
+  .app-scroll-root {
+    padding-block-end: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .app-body-shell-outer--boxed {
+    padding-inline: 0;
+  }
+
+  /* Móvil: una sola capa de fondo en el header (sin blur/velo duplicado en toolbar) */
+  .ts-horizontal-layout-header .ts-horizontal-layout-navbar::before,
+  .ts-horizontal-layout-header .header-nav-band--adaptive::before,
+  .ts-horizontal-layout-header .header-nav-band--detached::before {
+    content: none;
+    display: none;
+  }
+
+  .ts-horizontal-layout-header .ts-horizontal-layout-navbar,
+  .ts-horizontal-layout-header .header-nav-band--adaptive,
+  .ts-horizontal-layout-header .header-nav-band--detached {
+    position: relative;
+    z-index: 1;
+    isolation: auto;
+    background-color: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-nav-band--adaptive {
+    position: relative;
+    z-index: calc(var(--header-z-index) - 1);
+    padding-inline: 0;
+    padding-block: 0;
+  }
+
+  .header-nav-band--adaptive > div,
+  .header-nav-band__inner--adaptive {
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding-inline: 0;
+  }
+
+  .ts-horizontal-layout-header .header-navbar-shell--adaptive {
+    box-sizing: border-box;
+    inline-size: var(--header-content-inline-size);
+    margin-inline: auto;
+    gap: 0.75rem;
+  }
+
+  [data-body-shell-width='boxed'] .ts-horizontal-layout-header .header-nav-band--adaptive {
+    inline-size: 100%;
+    max-inline-size: none;
+    margin-inline: 0;
+  }
+
+  [data-body-shell-width='boxed'] .ts-horizontal-layout-header .header-navbar-shell--adaptive {
+    max-inline-size: var(--body-shell-max-width, 1440px);
+  }
+
+  [data-header-bg='custom'] .ts-horizontal-layout-header,
+  [data-header-bg-image='on'] .ts-horizontal-layout-header {
+    background-color: var(--header-surface-bg) !important;
+    background-image: var(--header-surface-bg-image), var(--header-surface-bg-gradient) !important;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-header-bg='default'] .ts-horizontal-layout-header {
+    background-color: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-header-bg='default'] .ts-horizontal-layout-header.ts-horizontal-layout-header-blur::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+    background-color: var(--header-surface-bg);
+    background-image: none;
+    backdrop-filter: var(--header-surface-backdrop);
+    -webkit-backdrop-filter: var(--header-surface-backdrop);
+  }
+
+  [data-header-bg='default'] .ts-horizontal-layout-header:not(.ts-horizontal-layout-header-blur) {
+    background-color: var(--header-surface-bg) !important;
+  }
+
+  [data-header-bg-image='on'] .ts-horizontal-layout-header::before {
+    z-index: 0;
+  }
+
+  [data-header-bg-image='on'] .ts-horizontal-layout-header > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Fila 1: mismo inset que la banda de iconos (padding en el shell exterior rompe flex) */
+  .ts-horizontal-layout-header .ts-horizontal-layout-navbar {
+    padding-inline: 0;
+  }
+
+  .ts-horizontal-layout-header .header-navbar-shell--mobile,
+  .ts-horizontal-layout-header .header-navbar-shell--adaptive {
+    box-sizing: border-box;
+    inline-size: var(--header-content-inline-size);
+    margin-inline: auto;
+  }
+
+  .header-nav-band--detached > div,
+  .header-nav-band--adaptive > div,
+  .header-nav-band__inner--mobile,
+  .header-nav-band__inner--adaptive {
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding-inline: 0;
+  }
+
+  [data-body-shell-width='boxed'] .ts-horizontal-layout-header .ts-horizontal-layout-navbar {
+    inline-size: 100%;
+    max-inline-size: none;
+    margin-inline: 0;
+  }
+
+  [data-body-shell-width='boxed'] .ts-horizontal-layout-header .header-nav-band--detached {
+    inline-size: 100%;
+    max-inline-size: none;
+    margin-inline: 0;
+  }
+
+  [data-body-shell-width='boxed'] .ts-horizontal-layout-header .header-navbar-shell--mobile {
+    max-inline-size: var(--body-shell-max-width, 1440px);
+  }
+
+  .header-navbar-shell--mobile {
+    gap: 0.75rem;
+  }
+
+  .header-search-icon-btn {
+    color: var(--mui-palette-text-primary);
+  }
+
+  [data-header-bg='custom'] .header-search-icon-btn,
+  [data-header-bg-image='on'] .header-search-icon-btn,
+  [data-header-contrast='light'] .header-search-icon-btn {
+    color: var(--header-fg-muted);
+  }
+
+  [data-header-bg='custom'] .header-search-icon-btn:hover,
+  [data-header-bg-image='on'] .header-search-icon-btn:hover,
+  [data-header-contrast='light'] .header-search-icon-btn:hover {
+    color: var(--header-fg);
+  }
+
+  .header-nav-tab-row {
+    --header-nav-tab-width: 5.30rem;
+    display: flex;
+    align-items: stretch;
+    inline-size: 100%;
+    min-block-size: 3.25rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header-nav-tab-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-nav-tab {
+    display: inline-flex;
+    flex: 0 0 var(--header-nav-tab-width);
+    inline-size: var(--header-nav-tab-width);
+    min-inline-size: var(--header-nav-tab-width);
+    max-inline-size: var(--header-nav-tab-width);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1875rem;
+    padding: 0.375rem 0 0;
+    border: 0;
+    background: transparent;
+    color: var(--mui-palette-text-secondary);
+    text-decoration: none;
+    cursor: pointer;
+    border-block-end: 3px solid transparent;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .header-nav-tab__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .header-nav-tab__label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+    inline-size: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-nav-tab:hover,
+  .header-nav-tab:focus-visible {
+    color: var(--mui-palette-text-primary);
+    background: var(--mui-palette-action-hover);
+  }
+
+  .header-nav-tab--active {
+    color: var(--mui-palette-text-primary);
+    background: rgb(var(--mui-palette-text-primaryChannel, var(--mui-mainColorChannels-light)) / 0.06);
+    border-block-end-color: var(--mui-palette-primary-main);
+    border-radius: 5px 5px 0 0;
+  }
+
+  [data-header-bg='custom'] .header-nav-tab,
+  [data-header-bg-image='on'] .header-nav-tab,
+  [data-header-contrast='light'] .header-nav-tab {
+    color: var(--header-fg-muted);
+  }
+
+  [data-header-bg='custom'] .header-nav-tab:hover,
+  [data-header-bg='custom'] .header-nav-tab:focus-visible,
+  [data-header-bg-image='on'] .header-nav-tab:hover,
+  [data-header-bg-image='on'] .header-nav-tab:focus-visible,
+  [data-header-contrast='light'] .header-nav-tab:hover,
+  [data-header-contrast='light'] .header-nav-tab:focus-visible {
+    color: var(--header-fg);
+    background: var(--header-fg-hover-bg);
+  }
+
+  [data-header-bg='custom'] .header-nav-tab--active,
+  [data-header-bg-image='on'] .header-nav-tab--active,
+  [data-header-contrast='light'] .header-nav-tab--active {
+    color: var(--header-fg);
+    background: var(--header-fg-active-bg);
+    border-block-end-color: var(--header-fg);
+    border-radius: 5px 5px 0 0;
+  }
+
+  .header-nav-tab--badged {
+    overflow: visible;
+  }
+
+  .header-nav-tab--badged .nav-highlight-badge-root {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .header-nav-tab--badged .nav-highlight-badge__anchor {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1875rem;
+    padding: 0;
+  }
+
+  .header-nav-tab--badged .nav-highlight-badge__content {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1875rem;
+  }
+
+  .header-nav-tab--badged .nav-highlight-badge-root .MuiBadge-badge.nav-highlight-badge {
+    font-size: 0.4375rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    padding: 0 2px;
+    min-width: 0;
+    block-size: 0.625rem;
+    border-radius: 999px;
+    top: 0;
+    right: 0;
+    transform: scale(1) translate(25%, -25%);
+    z-index: 1;
+  }
+}
+
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--header-z-index);
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+  background: var(--mui-palette-background-paper);
+  border-block-start: 1px solid var(--mui-palette-divider);
+  box-shadow: 0 -4px 20px rgb(var(--mui-mainColorChannels-shadow) / 0.08);
+}
+
+@media (max-width: 1199px) {
+  .mobile-bottom-nav {
+    display: block;
+  }
+}
+
+.mobile-bottom-nav__bar {
+  block-size: var(--mobile-bottom-nav-height);
+  background: transparent;
+}
+
+.mobile-bottom-nav__bar .MuiBottomNavigationAction-root {
+  min-inline-size: 0;
+  padding-block: 0.375rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+.mobile-bottom-nav__bar .MuiBottomNavigationAction-root.Mui-selected {
+  color: var(--mui-palette-primary-main);
+}
+
+.mobile-bottom-nav__bar .MuiBottomNavigationAction-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.mobile-bottom-nav-more.MuiModal-root {
+  z-index: var(--drawer-z-index);
+}
+
+.mobile-bottom-nav-more .MuiBackdrop-root.mobile-bottom-nav-more__backdrop {
+  z-index: 0 !important;
+  background-color: var(--mobile-more-backdrop-color);
+}
+
+.mobile-bottom-nav-more .MuiDrawer-root {
+  z-index: 1 !important;
+  position: relative;
+}
+
+.mobile-bottom-nav-more .MuiDrawer-paper.mobile-bottom-nav-more__sheet {
+  border-start-start-radius: 1rem;
+  border-start-end-radius: 1rem;
+  padding-block-end: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  max-block-size: 70dvh;
+  background-color: var(--mobile-more-sheet-bg) !important;
+  background-image: none !important;
+  border-block-start: 1px solid color-mix(in srgb, var(--mui-palette-divider) 65%, black 35%);
+  box-shadow: 0 -12px 40px rgb(0 0 0 / 0.42);
+}
+
+.mobile-bottom-nav-more__handle {
+  inline-size: 2.5rem;
+  block-size: 0.25rem;
+  margin: 0.625rem auto 0.375rem;
+  border-radius: 999px;
+  background: var(--mui-palette-divider);
+}
+
+.mobile-bottom-nav-more__list {
+  padding-block: 0.25rem 0.5rem;
+}
+
+.mobile-bottom-nav-more__item {
+  gap: 0.75rem;
+  padding-inline: 1.25rem;
+  padding-block: 0.875rem;
+}
+
+.mobile-bottom-nav-more__icon {
+  min-inline-size: 2rem;
+  color: var(--mui-palette-text-secondary);
+}
+
+.mobile-bottom-nav-more__item.Mui-selected .mobile-bottom-nav-more__icon {
+  color: var(--mui-palette-primary-main);
 }
 
 #nprogress {

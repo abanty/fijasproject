@@ -1,28 +1,18 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
 
 const syncHeaderHeight = () => {
   const header = document.querySelector(`.${horizontalLayoutClasses.header}`)
   const wrapper = document.querySelector(`.${horizontalLayoutClasses.contentWrapper}`)
+  const navbar = header?.querySelector(`.${horizontalLayoutClasses.navbar}`)
 
   if (!header || !wrapper) return
 
-  const navbarHeight = Math.ceil(header.getBoundingClientRect().height)
-  let stackHeight = navbarHeight
-
-  let node = header.nextElementSibling
-
-  while (node && !node.classList.contains('app-body-shell-outer')) {
-    if (node.classList.contains('header-nav-band--detached')) {
-      stackHeight += Math.ceil(node.getBoundingClientRect().height)
-    }
-
-    node = node.nextElementSibling
-  }
-
+  const navbarHeight = Math.ceil((navbar ?? header).getBoundingClientRect().height)
+  const stackHeight = Math.ceil(header.getBoundingClientRect().height)
   const nextNavbarHeight = `${navbarHeight}px`
   const nextStackHeight = `${stackHeight}px`
   const currentNavbarHeight = wrapper.style.getPropertyValue('--header-navbar-height')
@@ -38,10 +28,15 @@ const syncHeaderHeight = () => {
 }
 
 const HeaderHeightSync = () => {
+  useLayoutEffect(() => {
+    syncHeaderHeight()
+  }, [])
+
   useEffect(() => {
     syncHeaderHeight()
 
     const header = document.querySelector(`.${horizontalLayoutClasses.header}`)
+    const navbar = header?.querySelector(`.${horizontalLayoutClasses.navbar}`)
 
     if (!header) return undefined
 
@@ -49,14 +44,14 @@ const HeaderHeightSync = () => {
 
     observer.observe(header)
 
-    let node = header.nextElementSibling
+    if (navbar) {
+      observer.observe(navbar)
+    }
 
-    while (node && !node.classList.contains('app-body-shell-outer')) {
-      if (node.classList.contains('header-nav-band--detached')) {
-        observer.observe(node)
-      }
+    const navBand = header.querySelector('.header-nav-band--adaptive, .header-nav-band--detached')
 
-      node = node.nextElementSibling
+    if (navBand) {
+      observer.observe(navBand)
     }
 
     window.addEventListener('resize', syncHeaderHeight)

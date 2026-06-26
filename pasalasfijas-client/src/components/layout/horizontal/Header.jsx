@@ -7,12 +7,7 @@ import NavbarContent from './NavbarContent'
 import Navbar from '@layouts/components/horizontal/Navbar'
 import LayoutHeader from '@layouts/components/horizontal/Header'
 
-// Hook Imports
-import useHorizontalNav from '@menu/hooks/useHorizontalNav'
-
 const Header = () => {
-  const { isBreakpointReached } = useHorizontalNav()
-
   return (
     <>
       <HorizontalNavBreakpoint />
@@ -20,9 +15,8 @@ const Header = () => {
         <Navbar>
           <NavbarContent />
         </Navbar>
-        {!isBreakpointReached && <Navigation />}
+        <Navigation />
       </LayoutHeader>
-      {isBreakpointReached && <Navigation />}
     </>
   )
 }

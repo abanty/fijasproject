@@ -9,8 +9,7 @@ export const predictionsHelp = {
   dataQuality: 'Hay datos suficientes para confiar en esta lectura.',
   outcomeBar: 'Verde: local · Ámbar: empate · Azul: visitante. Porcentajes del modelo, no cuotas de casa.',
   premiumLock: 'Desbloquea la barra 1X2 y el análisis completo con membresía.',
-  freePlan:
-    'Plan gratuito con límite diario de desbloqueos. Premium: todos los picks, combinadas, stake e historial.',
+  freePlan: 'Límite diario en gratis. Premium: picks, combinadas e historial sin tope.',
   noBet:
     'El modelo no ve valor claro: riesgo alto, señales mixtas o cuota sin edge. Mejor no forzar apuesta.',
   reasonBet: 'Argumentos a favor del pick principal según el modelo.',

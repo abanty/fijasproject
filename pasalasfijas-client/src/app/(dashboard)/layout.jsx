@@ -19,12 +19,14 @@ import ScrollToTop from '@core/components/scroll-to-top'
 
 // Util Imports
 import { getThemeCookieState } from '@core/utils/serverHelpers'
+import { getServerUserSession } from '@/lib/getServerUserSession'
 
 const Layout = async props => {
   const { children } = props
 
   const direction = 'ltr'
   const { mode, settingsCookie, systemMode } = await getThemeCookieState()
+  const initialUser = await getServerUserSession()
 
   return (
     <Providers
@@ -32,6 +34,7 @@ const Layout = async props => {
       mode={mode}
       settingsCookie={settingsCookie}
       systemMode={systemMode}
+      initialUser={initialUser}
     >
       <LayoutWrapper
         systemMode={systemMode}

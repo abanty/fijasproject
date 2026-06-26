@@ -19,6 +19,7 @@ import Button from '@mui/material/Button'
 import Link from '@components/Link'
 import { useSettings } from '@core/hooks/useSettings'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
+import { adminNavigationItems } from '@/data/navigation/navigationCatalog'
 import { logout } from '@/services/authService'
 
 const DEFAULT_AVATAR = '/images/avatars/1.png'
@@ -132,8 +133,8 @@ const UserDropdown = () => {
                   <Divider className='mlb-1' />
                   {isAdmin ? (
                     <MenuItem component={Link} href='/admin' onClick={handleDropdownClose}>
-                      <i className='ri-settings-3-line mie-2' />
-                      Datos y operaciones
+                      <i className={`${adminNavigationItems.operationsHub.icon} mie-2`} />
+                      {adminNavigationItems.operationsHub.label}
                     </MenuItem>
                   ) : null}
                   <div className='flex items-center plb-2 pli-4'>

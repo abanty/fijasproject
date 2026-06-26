@@ -12,6 +12,7 @@ import { fontFamilyVariableClassNames } from '@configs/appFonts'
 // Util Imports
 import { getThemeCookieState } from '@core/utils/serverHelpers'
 import { resolveThemeRootSnapshot } from '@/lib/theme/resolveThemeRootSnapshot'
+import { buildInitNavViewportScript } from '@/lib/viewport/buildInitNavViewportScript'
 
 // Style Imports
 import '@/app/globals.css'
@@ -21,7 +22,12 @@ import '@assets/iconify-icons/generated-icons.css'
 
 export const metadata = {
   title: 'Pasame La Fija - Predicciones de futbol con IA',
-  description: 'Plataforma freemium de predicciones de futbol con IA, riesgo y control de valor.'
+  description: 'Plataforma freemium de predicciones de futbol con IA, riesgo y control de valor.',
+  icons: {
+    icon: '/images/logos/logoball.png',
+    shortcut: '/images/logos/logoball.png',
+    apple: '/images/logos/logoball.png'
+  }
 }
 
 const RootLayout = async props => {
@@ -46,6 +52,13 @@ const RootLayout = async props => {
       {...htmlDataAttributes}
       style={themeRoot.cssVars}
     >
+      <head>
+        <script
+          id='nav-viewport-init'
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: buildInitNavViewportScript() }}
+        />
+      </head>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <ColorSchemeInitScript defaultMode={systemMode} />
         {children}

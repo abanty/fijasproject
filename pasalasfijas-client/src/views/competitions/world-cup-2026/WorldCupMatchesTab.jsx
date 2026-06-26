@@ -1,15 +1,21 @@
 'use client'
 
+import { useState } from 'react'
+
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 
 import WorldCupMatchCard from '@/components/competitions/world-cup/WorldCupMatchCard'
-import WorldCupMatchesFilters from '@/components/competitions/world-cup/WorldCupMatchesFilters'
+import WorldCupMatchesFilters, {
+  WorldCupMatchesFiltersButton
+} from '@/components/competitions/world-cup/WorldCupMatchesFilters'
 import { groupMatchesByDate } from '@/lib/matches/matchScheduleFormat'
 import { useWorldCupMatchesFilters } from '@/views/competitions/world-cup-2026/hooks/useWorldCupMatchesFilters'
 
 const WorldCupMatchesTab = ({ matches }) => {
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
   const {
     phase,
     setPhase,
@@ -28,18 +34,34 @@ const WorldCupMatchesTab = ({ matches }) => {
   const grouped = groupMatchesByDate(filteredMatches)
 
   return (
-    <Stack spacing={0}>
+    <Stack spacing={0} className='world-cup-matches-tab'>
       <Stack
         direction='row'
-        spacing={2}
-        sx={{ alignItems: 'baseline', justifyContent: 'space-between', mb: 2.5 }}
+        spacing={1.5}
+        className='world-cup-matches-tab__header'
+        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
       >
-        <Typography variant='h4' fontWeight={800}>
-          Partidos
-        </Typography>
-        <Typography variant='body2' color='text.secondary' fontWeight={600}>
-          {matches.length} partidos
-        </Typography>
+        <Stack spacing={0.5} sx={{ minWidth: 0 }}>
+          <Typography
+            variant='h4'
+            fontWeight={800}
+            sx={{ lineHeight: 1.2, fontSize: { xs: '1.25rem', md: '2.125rem' } }}
+          >
+            Partidos
+          </Typography>
+          <Typography variant='caption' color='text.secondary' fontWeight={600}>
+            {filteredMatches.length} partidos
+          </Typography>
+        </Stack>
+
+        <span className='wc-viewport-mobile-only'>
+          <WorldCupMatchesFiltersButton
+            phase={phase}
+            stadium={stadium}
+            teamCode={teamCode}
+            onOpen={() => setFiltersOpen(true)}
+          />
+        </span>
       </Stack>
 
       <WorldCupMatchesFilters
@@ -54,18 +76,16 @@ const WorldCupMatchesTab = ({ matches }) => {
         onTeamChange={setTeamCode}
         quickFilter={quickFilter}
         onQuickFilterChange={setQuickFilter}
+        filtersOpen={filtersOpen}
+        onFiltersOpenChange={setFiltersOpen}
       />
 
       {grouped.length === 0 ? (
         <Typography color='text.secondary'>No hay partidos con los filtros seleccionados.</Typography>
       ) : (
         grouped.map(group => (
-          <Stack key={group.dayKey} spacing={2} sx={{ mb: 4 }}>
-            <Typography
-              variant='h6'
-              fontWeight={700}
-              sx={{ textTransform: 'capitalize' }}
-            >
+          <Stack key={group.dayKey} spacing={2} className='world-cup-matches-tab__day-group'>
+            <Typography variant='h6' fontWeight={700} sx={{ textTransform: 'capitalize' }}>
               {group.label}
             </Typography>
 

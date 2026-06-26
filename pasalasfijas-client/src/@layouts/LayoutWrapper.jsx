@@ -17,9 +17,11 @@ const LayoutWrapper = props => {
   useLayoutInit(systemMode)
 
   // Return the layout based on the layout context
+  const isHorizontal = settings.layout === 'horizontal'
+
   return (
     <div className='flex flex-col flex-auto min-bs-0 is-full' data-skin={settings.skin}>
-      <AppScrollRoot>{settings.layout === 'horizontal' ? horizontalLayout : verticalLayout}</AppScrollRoot>
+      {isHorizontal ? horizontalLayout : <AppScrollRoot>{verticalLayout}</AppScrollRoot>}
     </div>
   )
 }
