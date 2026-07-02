@@ -1,4 +1,5 @@
 // Third-party Imports
+import Script from 'next/script'
 import 'react-perfect-scrollbar/dist/css/styles.css'
 import 'animate.css/animate.min.css'
 import 'nprogress/nprogress.css'
@@ -52,14 +53,12 @@ const RootLayout = async props => {
       {...htmlDataAttributes}
       style={themeRoot.cssVars}
     >
-      <head>
-        <script
+      <body className='flex is-full min-bs-full flex-auto flex-col'>
+        <Script
           id='nav-viewport-init'
-          suppressHydrationWarning
+          strategy='beforeInteractive'
           dangerouslySetInnerHTML={{ __html: buildInitNavViewportScript() }}
         />
-      </head>
-      <body className='flex is-full min-bs-full flex-auto flex-col'>
         <ColorSchemeInitScript defaultMode={systemMode} />
         {children}
       </body>

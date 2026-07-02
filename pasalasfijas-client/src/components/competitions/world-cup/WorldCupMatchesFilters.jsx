@@ -28,6 +28,26 @@ const autocompleteSx = {
   '& .MuiOutlinedInput-root': { borderRadius: 2 }
 }
 
+const mobileAutocompleteSx = {
+  width: '100%',
+  '& .MuiOutlinedInput-root': { borderRadius: 2 }
+}
+
+const drawerAutocompleteSlotProps = {
+  popper: {
+    className: 'world-cup-filters-drawer__popper',
+    placement: 'top-start',
+    modifiers: [
+      { name: 'offset', options: { offset: [0, 6] } },
+      { name: 'flip', enabled: false },
+      { name: 'preventOverflow', options: { padding: 12, altAxis: true } }
+    ]
+  },
+  listbox: {
+    sx: { maxHeight: 240 }
+  }
+}
+
 const phaseLabel = value => (value === 'all' ? 'Todas las fases' : value)
 const stadiumLabel = value => (value === 'all' ? 'Todos los estadios' : value)
 const teamLabel = team => {
@@ -66,61 +86,69 @@ const WorldCupMatchesFilters = ({
     teamCode === 'all' ? ALL_TEAMS : teams.find(team => team.code === teamCode) ?? ALL_TEAMS
   const activeAdvancedCount = countAdvancedFilters(phase, stadium, teamCode)
 
-  const autocompleteFields = (
-    <>
-      <Autocomplete
-        size='small'
-        disableClearable
-        sx={autocompleteSx}
-        options={phaseOptions}
-        value={phase}
-        onChange={(_, value) => onPhaseChange(value ?? 'all')}
-        getOptionLabel={phaseLabel}
-        isOptionEqualToValue={(a, b) => a === b}
-        renderInput={params => <TextField {...params} label='Fase' />}
-      />
+  const renderAutocompleteFields = (layout = 'desktop') => {
+    const fieldSx = layout === 'mobile' ? mobileAutocompleteSx : autocompleteSx
+    const mobileProps =
+      layout === 'mobile' ? { size: 'small', slotProps: drawerAutocompleteSlotProps } : { size: 'small' }
 
-      <Autocomplete
-        size='small'
-        disableClearable
-        sx={autocompleteSx}
-        options={stadiumOptions}
-        value={stadium}
-        onChange={(_, value) => onStadiumChange(value ?? 'all')}
-        getOptionLabel={stadiumLabel}
-        isOptionEqualToValue={(a, b) => a === b}
-        renderInput={params => <TextField {...params} label='Estadio' />}
-      />
+    const fieldProps = {
+      disableClearable: true,
+      sx: fieldSx,
+      ...mobileProps
+    }
 
-      <Autocomplete
-        size='small'
-        disableClearable
-        sx={autocompleteSx}
-        options={teamOptions}
-        value={selectedTeam}
-        onChange={(_, option) => onTeamChange(option?.code ?? 'all')}
-        getOptionLabel={teamLabel}
-        isOptionEqualToValue={(a, b) => a.code === b.code}
-        renderOption={(props, option) => {
-          const { key, ...optionProps } = props
+    return (
+      <>
+        <Autocomplete
+          {...fieldProps}
+          options={phaseOptions}
+          value={phase}
+          onChange={(_, value) => onPhaseChange(value ?? 'all')}
+          getOptionLabel={phaseLabel}
+          isOptionEqualToValue={(a, b) => a === b}
+          renderInput={params => <TextField {...params} label='Fase' />}
+        />
 
-          return (
-            <li key={key} {...optionProps}>
-              {option.code === 'all' ? (
-                option.name
-              ) : (
-                <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-                  <CountryFlag code={option.code} size={18} variant='sphere' />
-                  {teamLabel(option)}
-                </Box>
-              )}
-            </li>
-          )
-        }}
-        renderInput={params => <TextField {...params} label='Selección' placeholder='Buscar selección' />}
-      />
-    </>
-  )
+        <Autocomplete
+          {...fieldProps}
+          options={stadiumOptions}
+          value={stadium}
+          onChange={(_, value) => onStadiumChange(value ?? 'all')}
+          getOptionLabel={stadiumLabel}
+          isOptionEqualToValue={(a, b) => a === b}
+          renderInput={params => <TextField {...params} label='Estadio' />}
+        />
+
+        <Autocomplete
+          {...fieldProps}
+          options={teamOptions}
+          value={selectedTeam}
+          onChange={(_, option) => onTeamChange(option?.code ?? 'all')}
+          getOptionLabel={teamLabel}
+          isOptionEqualToValue={(a, b) => a.code === b.code}
+          renderOption={(props, option) => {
+            const { key, ...optionProps } = props
+
+            return (
+              <li key={key} {...optionProps}>
+                {option.code === 'all' ? (
+                  option.name
+                ) : (
+                  <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+                    <CountryFlag code={option.code} size={18} variant='sphere' />
+                    {teamLabel(option)}
+                  </Box>
+                )}
+              </li>
+            )
+          }}
+          renderInput={params => (
+            <TextField {...params} label='Selección' placeholder='Buscar selección' />
+          )}
+        />
+      </>
+    )
+  }
 
   const quickFilters = (
     <ToggleButtonGroup
@@ -160,10 +188,9 @@ const WorldCupMatchesFilters = ({
       <Stack
         direction='row'
         spacing={1.5}
-        className='wc-viewport-desktop-only'
-        sx={{ flexWrap: 'wrap' }}
+        sx={{ display: { xs: 'none', md: 'flex' }, flexWrap: 'wrap' }}
       >
-        {autocompleteFields}
+        {renderAutocompleteFields('desktop')}
       </Stack>
 
       <Drawer
@@ -171,36 +198,50 @@ const WorldCupMatchesFilters = ({
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         className='world-cup-filters-drawer'
-        PaperProps={{ className: 'world-cup-filters-drawer__paper' }}
+        slotProps={{
+          paper: { className: 'world-cup-filters-drawer__paper' },
+          backdrop: { className: 'world-cup-filters-drawer__backdrop' }
+        }}
       >
         <Box className='world-cup-filters-drawer__handle' aria-hidden />
-        <Stack spacing={2} sx={{ px: 2, pb: 2.5, pt: 1 }}>
-          <Stack direction='row' alignItems='center' justifyContent='space-between'>
-            <Typography variant='h6' fontWeight={700}>
-              Filtros
-            </Typography>
-            <IconButton size='small' onClick={() => setModalOpen(false)} aria-label='Cerrar filtros'>
+
+        <Box className='world-cup-filters-drawer__header'>
+          <Box className='world-cup-filters-drawer__header-row'>
+            <Box sx={{ minWidth: 0, pr: 1 }}>
+              <Typography variant='h6' fontWeight={700} sx={{ lineHeight: 1.25 }}>
+                Filtros
+              </Typography>
+              <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+                Fase, estadio o selección
+              </Typography>
+            </Box>
+            <IconButton
+              size='small'
+              onClick={() => setModalOpen(false)}
+              aria-label='Cerrar filtros'
+              className='world-cup-filters-drawer__close'
+            >
               <RemixIcon icon='ri-close-line' size='sm' />
             </IconButton>
-          </Stack>
+          </Box>
+        </Box>
 
-          <Stack spacing={1.5}>{autocompleteFields}</Stack>
+        <Box className='world-cup-filters-drawer__fields'>{renderAutocompleteFields('mobile')}</Box>
 
-          <Stack direction='row' spacing={1}>
-            <Button
-              variant='outlined'
-              color='inherit'
-              fullWidth
-              onClick={resetAdvancedFilters}
-              disabled={activeAdvancedCount === 0}
-            >
-              Limpiar
-            </Button>
-            <Button variant='contained' fullWidth onClick={() => setModalOpen(false)}>
-              Ver resultados
-            </Button>
-          </Stack>
-        </Stack>
+        <Box className='world-cup-filters-drawer__actions'>
+          <Button
+            variant='outlined'
+            fullWidth
+            onClick={resetAdvancedFilters}
+            disabled={activeAdvancedCount === 0}
+            className='world-cup-filters-drawer__clear'
+          >
+            Limpiar
+          </Button>
+          <Button variant='contained' fullWidth onClick={() => setModalOpen(false)}>
+            Ver resultados
+          </Button>
+        </Box>
       </Drawer>
 
       <Box className='world-cup-quick-filters-scroll'>{quickFilters}</Box>

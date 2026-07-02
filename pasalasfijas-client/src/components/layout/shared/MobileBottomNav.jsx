@@ -14,6 +14,7 @@ import ListItemText from '@mui/material/ListItemText'
 import { useCurrentUser } from '@/hooks/useCurrentUser'
 import { getBottomNavConfig } from '@/data/navigation/navigationCatalog'
 import { isNavActive } from '@/lib/navigation/isNavActive'
+import { prefetchNavData } from '@/lib/query/prefetchNavData'
 
 const isAdminRole = role => role === 'ADMIN' || role === 'SUPER_ADMIN'
 
@@ -46,10 +47,14 @@ const MobileBottomNav = () => {
     }
 
     const target = primary.find(item => item.id === newValue)
-    if (target?.href) router.push(target.href)
+    if (target?.href) {
+      prefetchNavData(target.href)
+      router.push(target.href)
+    }
   }
 
   const handleMoreNavigate = href => {
+    prefetchNavData(href)
     setMoreOpen(false)
     router.push(href)
   }

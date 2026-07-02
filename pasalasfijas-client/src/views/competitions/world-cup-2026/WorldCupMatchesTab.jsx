@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -10,11 +11,13 @@ import WorldCupMatchCard from '@/components/competitions/world-cup/WorldCupMatch
 import WorldCupMatchesFilters, {
   WorldCupMatchesFiltersButton
 } from '@/components/competitions/world-cup/WorldCupMatchesFilters'
+import { WorldCupMatchesTabLoading } from '@/components/loading/PageLoading'
 import { groupMatchesByDate } from '@/lib/matches/matchScheduleFormat'
 import { useWorldCupMatchesFilters } from '@/views/competitions/world-cup-2026/hooks/useWorldCupMatchesFilters'
 
-const WorldCupMatchesTab = ({ matches }) => {
+const WorldCupMatchesTab = ({ matches, loading = false }) => {
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const safeMatches = matches ?? []
 
   const {
     phase,
@@ -29,9 +32,10 @@ const WorldCupMatchesTab = ({ matches }) => {
     quickFilter,
     setQuickFilter,
     filteredMatches
-  } = useWorldCupMatchesFilters(matches)
+  } = useWorldCupMatchesFilters(safeMatches)
 
   const grouped = groupMatchesByDate(filteredMatches)
+  const showMatchesSkeleton = loading && matches === undefined
 
   return (
     <Stack spacing={0} className='world-cup-matches-tab'>
@@ -54,14 +58,14 @@ const WorldCupMatchesTab = ({ matches }) => {
           </Typography>
         </Stack>
 
-        <span className='wc-viewport-mobile-only'>
+        <Box sx={{ display: { xs: 'inline-flex', md: 'none' }, flexShrink: 0 }}>
           <WorldCupMatchesFiltersButton
             phase={phase}
             stadium={stadium}
             teamCode={teamCode}
             onOpen={() => setFiltersOpen(true)}
           />
-        </span>
+        </Box>
       </Stack>
 
       <WorldCupMatchesFilters
@@ -80,7 +84,9 @@ const WorldCupMatchesTab = ({ matches }) => {
         onFiltersOpenChange={setFiltersOpen}
       />
 
-      {grouped.length === 0 ? (
+      {showMatchesSkeleton ? (
+        <WorldCupMatchesTabLoading />
+      ) : grouped.length === 0 ? (
         <Typography color='text.secondary'>No hay partidos con los filtros seleccionados.</Typography>
       ) : (
         grouped.map(group => (

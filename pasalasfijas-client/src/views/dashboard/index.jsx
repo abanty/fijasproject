@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 
@@ -10,25 +8,15 @@ import { DashboardPageLoading } from '@/components/loading/PageLoading'
 import PredictionCard from '@/components/predictions/PredictionCard'
 import { useCompactDensity } from '@core/hooks/useCompactDensity'
 import UpgradeBanner from '@/components/subscription/UpgradeBanner'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
+import { queryKeys } from '@/lib/query/queryKeys'
 import { getTodayPredictions } from '@/services/predictionsService'
 
 const DashboardView = () => {
   const compact = useCompactDensity()
-  const [data, setData] = useState(null)
+  const { data, isLoading } = useCachedQuery(queryKeys.predictions.today, getTodayPredictions)
 
-  useEffect(() => {
-    let active = true
-
-    getTodayPredictions().then(result => {
-      if (active) setData(result)
-    })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (!data) {
+  if (isLoading) {
     return <DashboardPageLoading />
   }
 

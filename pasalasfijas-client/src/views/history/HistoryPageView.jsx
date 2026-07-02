@@ -1,31 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import HistoryView from '@/views/history'
 import { DashboardPageLoading } from '@/components/loading/PageLoading'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
+import { queryKeys } from '@/lib/query/queryKeys'
 import { getPredictionHistory } from '@/services/predictionsService'
 
 const HistoryPageView = () => {
-  const [data, setData] = useState(null)
+  const { data, isLoading } = useCachedQuery(queryKeys.predictions.history, getPredictionHistory, {
+    onError: () => ({ locked: true, reason: 'PREMIUM_REQUIRED', items: [] })
+  })
 
-  useEffect(() => {
-    let active = true
-
-    getPredictionHistory()
-      .then(result => {
-        if (active) setData(result)
-      })
-      .catch(() => {
-        if (active) setData({ locked: true, reason: 'PREMIUM_REQUIRED', items: [] })
-      })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (!data) return <DashboardPageLoading />
+  if (isLoading) return <DashboardPageLoading />
 
   return <HistoryView historyData={data} />
 }

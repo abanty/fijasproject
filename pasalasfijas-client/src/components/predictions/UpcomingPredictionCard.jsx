@@ -18,6 +18,7 @@ import { useCompactDensity } from '@core/hooks/useCompactDensity'
 import { resolveCountryCode } from '@/lib/country/resolveCountryCode'
 import { formatExpectedGoals, formatKickoffRelative, formatMatchDayTime } from '@/lib/predictionFormatters'
 import { predictionsHelp } from '@/lib/ui/predictionsHelp'
+import { readFavoriteIds, writeFavoriteIds } from '@/lib/predictionFavorites'
 import MatchOutcomeBar from './MatchOutcomeBar'
 
 const statusLabels = {
@@ -26,29 +27,10 @@ const statusLabels = {
   FINISHED: 'Fin'
 }
 
-const FAVORITES_STORAGE_KEY = 'prediction-favorites'
 
-const readFavoriteIds = () => {
-  if (typeof window === 'undefined') return []
-
-  try {
-    const raw = localStorage.getItem(FAVORITES_STORAGE_KEY)
-
-    return raw ? JSON.parse(raw) : []
-  } catch {
-    return []
-  }
-}
-
-const writeFavoriteIds = ids => {
-  if (typeof window === 'undefined') return
-
-  localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(ids))
-}
-
-const UpcomingPredictionCard = ({ prediction }) => {
+const UpcomingPredictionCard = ({ prediction, favoriteIds }) => {
   const compact = useCompactDensity()
-  const [isFavorite, setIsFavorite] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(() => favoriteIds?.has(prediction.id) ?? false)
   const { day, time } = formatMatchDayTime(prediction.kickoffAt)
   const homeCode = resolveCountryCode(prediction.homeTeam, prediction.homeCountryCode)
   const awayCode = resolveCountryCode(prediction.awayTeam, prediction.awayCountryCode)
@@ -58,8 +40,10 @@ const UpcomingPredictionCard = ({ prediction }) => {
   const flagSize = compact ? 56 : 64
 
   useEffect(() => {
+    if (favoriteIds) return
+
     setIsFavorite(readFavoriteIds().includes(prediction.id))
-  }, [prediction.id])
+  }, [favoriteIds, prediction.id])
 
   const toggleFavorite = useCallback(
     event => {

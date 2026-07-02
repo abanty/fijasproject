@@ -23,6 +23,13 @@ import { useSettings } from '@core/hooks/useSettings'
 import horizontalMenuData from '@/data/navigation/horizontalMenuData'
 
 import { isNavActive, isNavGroupActive } from '@/lib/navigation/isNavActive'
+import { prefetchNavData } from '@/lib/query/prefetchNavData'
+
+const navPrefetchProps = href => ({
+  onMouseEnter: () => prefetchNavData(href),
+  onFocus: () => prefetchNavData(href),
+  onTouchStart: () => prefetchNavData(href)
+})
 
 const navTabLabel = item => item.shortLabel ?? item.label
 
@@ -36,6 +43,7 @@ const HeaderNavLink = ({ item, pathname }) => {
       component={Link}
       href={item.href}
       aria-label={ariaLabel}
+      {...navPrefetchProps(item.href)}
       className={classnames(
         'header-nav-link inline-flex max-is-full font-medium plb-3 pli-1.5 hover:text-primary',
         {
@@ -64,6 +72,7 @@ const HeaderNavTab = ({ item, pathname }) => {
       href={item.href}
       aria-label={ariaLabel}
       aria-current={isActive ? 'page' : undefined}
+      {...navPrefetchProps(item.href)}
       className={classnames('header-nav-tab', {
         'header-nav-tab--active': isActive,
         'header-nav-tab--badged': item.highlight
@@ -132,6 +141,7 @@ const HeaderNavGroup = ({ item, pathname, mobile = false }) => {
                     onClick={() => setOpen(false)}
                     selected={isNavActive(pathname, child.href)}
                     className='header-nav-dropdown-item gap-3'
+                    {...navPrefetchProps(child.href)}
                   >
                     <RemixIcon icon={child.icon} size='md' />
                     {child.label}
@@ -171,7 +181,7 @@ const HeaderNavGroup = ({ item, pathname, mobile = false }) => {
   }
 
   return (
-    <>
+    <span className='header-nav-item inline-flex max-is-full'>
       <Typography
         ref={anchorRef}
         component='button'
@@ -190,7 +200,7 @@ const HeaderNavGroup = ({ item, pathname, mobile = false }) => {
         <i className={classnames('ri-arrow-down-s-line text-lg transition-transform', { 'rotate-180': open })} />
       </Typography>
       {dropdown}
-    </>
+    </span>
   )
 }
 
@@ -200,7 +210,7 @@ const FrontMenu = () => {
 
   return (
     <>
-      <div className='header-nav-row header-viewport-desktop-only flex items-center flex-wrap gap-x-6 gap-y-3'>
+      <div className='header-nav-row header-viewport-desktop-only flex items-center flex-wrap'>
         {items.map(item =>
           item.children?.length ? (
             <HeaderNavGroup key={item.id} item={item} pathname={pathname} />

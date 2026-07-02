@@ -1,41 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import CompetitionsView from '@/views/competitions'
 import { DashboardPageLoading } from '@/components/loading/PageLoading'
-import { getCompetitionMatchCounts, getCompetitions } from '@/services/competitionsService'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
+import { queryKeys } from '@/lib/query/queryKeys'
+import { loadCompetitionsPageData } from '@/services/competitionsService'
 
 const CompetitionsPage = () => {
-  const [data, setData] = useState(null)
+  const { data, isLoading } = useCachedQuery(queryKeys.competitions.matchCounts, loadCompetitionsPageData)
 
-  useEffect(() => {
-    let active = true
-
-    getCompetitionMatchCounts()
-      .then(matchCounts => {
-        if (active) {
-          setData({
-            competitions: getCompetitions(),
-            matchCounts
-          })
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setData({
-            competitions: getCompetitions(),
-            matchCounts: {}
-          })
-        }
-      })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (!data) return <DashboardPageLoading />
+  if (isLoading) return <DashboardPageLoading />
 
   return <CompetitionsView competitions={data.competitions} matchCounts={data.matchCounts} />
 }

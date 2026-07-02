@@ -4,22 +4,41 @@ import { getCompetitionMatches as fetchCompetitionMatches, getTodayMatches } fro
 export const getCompetitions = () => competitionsCatalog
 
 export const getCompetitionMatchCounts = async () => {
+  const worldCup = competitionsCatalog.find(competition => competition.slug === 'world-cup-2026')
+  const others = competitionsCatalog.filter(competition => competition.slug !== 'world-cup-2026')
+
+  const [worldCupData, todayData] = await Promise.all([
+    worldCup ? fetchCompetitionMatches(worldCup.slug) : Promise.resolve({ items: [] }),
+    others.length ? getTodayMatches() : Promise.resolve({ items: [] })
+  ])
+
   const counts = {}
 
-  await Promise.all(
-    competitionsCatalog.map(async competition => {
-      if (competition.slug === 'world-cup-2026') {
-        const data = await fetchCompetitionMatches(competition.slug)
-        counts[competition.slug] = data.items.length
-        return
-      }
+  if (worldCup) {
+    counts[worldCup.slug] = worldCupData.items.length
+  }
 
-      const data = await getTodayMatches()
-      counts[competition.slug] = data.items.filter(item => item.competitionSlug === competition.slug).length
-    })
-  )
+  others.forEach(competition => {
+    counts[competition.slug] = todayData.items.filter(item => item.competitionSlug === competition.slug).length
+  })
 
   return counts
 }
 
 export const getCompetitionMatches = slug => fetchCompetitionMatches(slug)
+
+export const loadCompetitionsPageData = async () => {
+  try {
+    const matchCounts = await getCompetitionMatchCounts()
+
+    return {
+      competitions: getCompetitions(),
+      matchCounts
+    }
+  } catch {
+    return {
+      competitions: getCompetitions(),
+      matchCounts: {}
+    }
+  }
+}

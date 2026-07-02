@@ -1,36 +1,27 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import Typography from '@mui/material/Typography'
 
 import BankrollSetup from '@/components/bankroll/BankrollSetup'
 import { DashboardPageLoading } from '@/components/loading/PageLoading'
 import BankrollView from '@/views/bankroll'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
+import { queryKeys } from '@/lib/query/queryKeys'
 import { getBankrollSummary } from '@/services/bankrollService'
 
 const BankrollPageView = () => {
-  const [bankroll, setBankroll] = useState(undefined)
+  const [createdBankroll, setCreatedBankroll] = useState(null)
+  const { data: bankroll, isLoading } = useCachedQuery(queryKeys.bankroll.summary, getBankrollSummary, {
+    onError: () => null
+  })
 
-  useEffect(() => {
-    let active = true
+  const activeBankroll = createdBankroll ?? bankroll
 
-    getBankrollSummary()
-      .then(result => {
-        if (active) setBankroll(result)
-      })
-      .catch(() => {
-        if (active) setBankroll(null)
-      })
+  if (isLoading && !createdBankroll) return <DashboardPageLoading />
 
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (bankroll === undefined) return <DashboardPageLoading />
-
-  if (!bankroll) {
+  if (!activeBankroll) {
     return (
       <div className='page-stack flex flex-col gap-6'>
         <div>
@@ -39,12 +30,12 @@ const BankrollPageView = () => {
             Vista inicial para tracking interno. La app no procesa apuestas reales.
           </Typography>
         </div>
-        <BankrollSetup onCreated={setBankroll} />
+        <BankrollSetup onCreated={setCreatedBankroll} />
       </div>
     )
   }
 
-  return <BankrollView bankroll={bankroll} />
+  return <BankrollView bankroll={activeBankroll} />
 }
 
 export default BankrollPageView

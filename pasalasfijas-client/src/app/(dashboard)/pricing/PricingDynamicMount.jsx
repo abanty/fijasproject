@@ -1,11 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import { DashboardPageLoading } from '@/components/loading/PageLoading'
+import { createRouteLazyMount } from '@/components/loading/createRouteLazyMount'
 
-const PricingPageView = dynamic(() => import('@/views/pricing/PricingPageView'), {
-  ssr: false
+export default createRouteLazyMount({
+  routeKey: '/pricing',
+  loadView: () => import('@/views/pricing/PricingPageView'),
+  Loading: DashboardPageLoading
 })
-
-export default function PricingDynamicMount() {
-  return <PricingPageView />
-}

@@ -10,6 +10,13 @@ import classnames from 'classnames'
 
 import Link from '@components/Link'
 import RemixIcon from '@components/shared/RemixIcon'
+import { prefetchNavData } from '@/lib/query/prefetchNavData'
+
+const navPrefetchProps = href => ({
+  onMouseEnter: () => prefetchNavData(href),
+  onFocus: () => prefetchNavData(href),
+  onTouchStart: () => prefetchNavData(href)
+})
 
 const CompetitionCard = ({ competition, matchCount }) => {
   const href = `/matches/${competition.slug}`
@@ -23,6 +30,7 @@ const CompetitionCard = ({ competition, matchCount }) => {
     <Card
       component={Link}
       href={href}
+      {...navPrefetchProps(href)}
       className={classnames('competition-card block no-underline text-inherit', {
         'competition-card--featured': competition.featured,
         'competition-card--has-bg': hasBackground
@@ -45,13 +53,18 @@ const CompetitionCard = ({ competition, matchCount }) => {
             <RemixIcon icon={competition.icon} size='xl' />
           </div>
           <div className='min-is-0 flex flex-col gap-2'>
-            <Typography variant='h6' className='competition-card__title font-semibold leading-snug'>
+            <Typography
+              variant='h6'
+              className='competition-card__title font-semibold leading-snug'
+              sx={hasBackground ? { color: '#fff' } : undefined}
+            >
               {competition.title}
             </Typography>
             <Typography
               variant='body2'
               color={hasBackground ? undefined : 'text.secondary'}
               className='competition-card__description leading-relaxed'
+              sx={hasBackground ? { color: 'rgb(255 255 255 / 0.82)' } : undefined}
             >
               {competition.description}
             </Typography>
@@ -60,7 +73,23 @@ const CompetitionCard = ({ competition, matchCount }) => {
 
         <div className='flex items-center justify-between gap-3 mbs-auto'>
           {countLabel ? (
-            <Chip size='small' variant='tonal' color='primary' label={countLabel} className='competition-card__chip' />
+            <Chip
+              size='small'
+              variant='tonal'
+              color={hasBackground ? 'default' : 'primary'}
+              label={countLabel}
+              className='competition-card__chip'
+              sx={
+                hasBackground
+                  ? {
+                      color: '#fff',
+                      border: '1px solid rgb(255 255 255 / 0.22)',
+                      backgroundColor: 'rgb(255 255 255 / 0.14)',
+                      '& .MuiChip-label': { color: '#fff' }
+                    }
+                  : undefined
+              }
+            />
           ) : (
             <span />
           )}
@@ -70,6 +99,7 @@ const CompetitionCard = ({ competition, matchCount }) => {
             variant='text'
             color={hasBackground ? 'inherit' : competition.featured ? 'primary' : 'inherit'}
             className='competition-card__cta shrink-0'
+            sx={hasBackground ? { color: '#fff' } : undefined}
             endIcon={<RemixIcon icon='ri-arrow-right-line' size='sm' />}
           >
             Ver partidos

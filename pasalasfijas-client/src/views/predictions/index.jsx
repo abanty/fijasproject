@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-
 import Chip from '@mui/material/Chip'
 import Typography from '@mui/material/Typography'
 
@@ -12,27 +10,17 @@ import UpcomingPredictionsFeed from '@/components/predictions/UpcomingPrediction
 import SectionHeading from '@/components/shared/SectionHeading'
 import UpgradeBanner from '@/components/subscription/UpgradeBanner'
 import { PredictionsPageLoading } from '@/components/loading/PageLoading'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
 import { predictionsHelp } from '@/lib/ui/predictionsHelp'
+import { queryKeys } from '@/lib/query/queryKeys'
 import { getTodayPredictions } from '@/services/predictionsService'
 
 const ROCKET_ICON = '/images/illustrations/characters/3d-rocket.png'
 
 const PredictionsView = () => {
-  const [data, setData] = useState(null)
+  const { data, isLoading } = useCachedQuery(queryKeys.predictions.today, getTodayPredictions)
 
-  useEffect(() => {
-    let active = true
-
-    getTodayPredictions().then(result => {
-      if (active) setData(result)
-    })
-
-    return () => {
-      active = false
-    }
-  }, [])
-
-  if (!data) {
+  if (isLoading) {
     return <PredictionsPageLoading />
   }
 

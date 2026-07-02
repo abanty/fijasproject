@@ -1,13 +1,6 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-
-import { DashboardPageLoading } from '@/components/loading/PageLoading'
-
-const DashboardView = dynamic(() => import('@/views/dashboard'), {
-  ssr: false,
-  loading: () => <DashboardPageLoading />
-})
+import DashboardView from '@/views/dashboard'
 
 export default function DashboardDynamicMount() {
   return <DashboardView />

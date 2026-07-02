@@ -1,14 +1,10 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-
 import { DashboardPageLoading } from '@/components/loading/PageLoading'
+import { createRouteLazyMount } from '@/components/loading/createRouteLazyMount'
 
-const AdminPageView = dynamic(() => import('@/views/admin/AdminPageView'), {
-  ssr: false,
-  loading: () => <DashboardPageLoading />
+export default createRouteLazyMount({
+  routeKey: '/admin',
+  loadView: () => import('@/views/admin/AdminPageView'),
+  Loading: DashboardPageLoading
 })
-
-export default function AdminDynamicMount() {
-  return <AdminPageView />
-}

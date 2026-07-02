@@ -7,7 +7,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import { worldCupTabs } from '@/data/competitions/worldCupHub'
 import { useHorizontalTouchScroll } from '@/hooks/useHorizontalTouchScroll'
 
-const WorldCupHubTabs = ({ activeTab, onTabChange, topContent, children }) => {
+const WorldCupHubTabs = ({ activeTab, onTabChange, panels }) => {
   const { ref: scrollRef, touchHandlers } = useHorizontalTouchScroll()
 
   return (
@@ -34,11 +34,21 @@ const WorldCupHubTabs = ({ activeTab, onTabChange, topContent, children }) => {
           </div>
         </div>
 
-        {topContent}
-
-        <TabPanel value={activeTab} sx={{ px: 0, pt: 0, pb: 0 }}>
-          {children}
-        </TabPanel>
+        {worldCupTabs.map(tab => (
+          <TabPanel
+            key={tab.id}
+            value={tab.id}
+            keepMounted
+            sx={{
+              px: 0,
+              pt: 0,
+              pb: 0,
+              display: activeTab === tab.id ? 'block' : 'none'
+            }}
+          >
+            {panels[tab.id]}
+          </TabPanel>
+        ))}
       </Box>
     </TabContext>
   )

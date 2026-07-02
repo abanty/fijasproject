@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 import Button from '@mui/material/Button'
@@ -11,38 +11,34 @@ import RemixIcon from '@components/shared/RemixIcon'
 import WorldCupHubTabs from '@/components/competitions/world-cup/WorldCupHubTabs'
 import WorldCupTitleProbabilityBar from '@/components/competitions/world-cup/WorldCupTitleProbabilityBar'
 import { worldCupTabs } from '@/data/competitions/worldCupHub'
-import { DashboardPageLoading } from '@/components/loading/PageLoading'
+import { useCachedQuery } from '@/hooks/useCachedQuery'
+import { queryKeys } from '@/lib/query/queryKeys'
 import { getCompetitionMatches } from '@/services/competitionsService'
 import ComingSoonView from '@/views/shared/ComingSoonView'
 import WorldCupMatchesTab from '@/views/competitions/world-cup-2026/WorldCupMatchesTab'
 
 const tabIds = new Set(worldCupTabs.map(tab => tab.id))
 
+const resolveTabId = tab => (tab && tabIds.has(tab) ? tab : 'partidos')
+
 const WorldCupHubPage = ({ competition }) => {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const requestedTab = searchParams.get('tab') ?? 'partidos'
-  const activeTab = tabIds.has(requestedTab) ? requestedTab : 'partidos'
-  const [matches, setMatches] = useState(null)
+  const [activeTab, setActiveTab] = useState(() => resolveTabId(searchParams.get('tab')))
+  const { data: matches, isLoading: matchesLoading } = useCachedQuery(
+    queryKeys.competitions.matches(competition.slug),
+    () => getCompetitionMatches(competition.slug).then(result => result.items),
+    { onError: () => [] }
+  )
 
   useEffect(() => {
-    let active = true
-
-    getCompetitionMatches(competition.slug)
-      .then(result => {
-        if (active) setMatches(result.items)
-      })
-      .catch(() => {
-        if (active) setMatches([])
-      })
-
-    return () => {
-      active = false
-    }
-  }, [competition.slug])
+    setActiveTab(resolveTabId(searchParams.get('tab')))
+  }, [searchParams])
 
   const handleTabChange = useCallback(
     tabId => {
+      setActiveTab(tabId)
+
       const params = new URLSearchParams(searchParams.toString())
       params.set('tab', tabId)
       router.replace(`/matches/${competition.slug}?${params.toString()}`, { scroll: false })
@@ -50,9 +46,35 @@ const WorldCupHubPage = ({ competition }) => {
     [competition.slug, router, searchParams]
   )
 
-  if (!matches) return <DashboardPageLoading />
+  const comingSoonPanels = useMemo(
+    () =>
+      Object.fromEntries(
+        worldCupTabs
+          .filter(tab => tab.id !== 'partidos')
+          .map(tab => [
+            tab.id,
+            <ComingSoonView
+              key={tab.id}
+              title={tab.label}
+              description={`${competition.title} — esta vista estará disponible pronto.`}
+            />
+          ])
+      ),
+    [competition.title]
+  )
 
-  const activeTabMeta = worldCupTabs.find(tab => tab.id === activeTab)
+  const panels = useMemo(
+    () => ({
+      partidos: (
+        <>
+          <WorldCupTitleProbabilityBar />
+          <WorldCupMatchesTab matches={matches} loading={matchesLoading} />
+        </>
+      ),
+      ...comingSoonPanels
+    }),
+    [comingSoonPanels, matches, matchesLoading]
+  )
 
   return (
     <Stack spacing={0} className='page-stack world-cup-hub-page' sx={{ minWidth: 0, width: '100%' }}>
@@ -74,19 +96,7 @@ const WorldCupHubPage = ({ competition }) => {
         Torneos activos
       </Button>
 
-      <WorldCupHubTabs
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        topContent={activeTab === 'partidos' ? <WorldCupTitleProbabilityBar /> : null}
-      >
-        {activeTab === 'partidos' ? <WorldCupMatchesTab matches={matches} /> : null}
-        {activeTab !== 'partidos' ? (
-          <ComingSoonView
-            title={activeTabMeta?.label ?? 'Sección'}
-            description={`${competition.title} — esta vista estará disponible pronto.`}
-          />
-        ) : null}
-      </WorldCupHubTabs>
+      <WorldCupHubTabs activeTab={activeTab} onTabChange={handleTabChange} panels={panels} />
     </Stack>
   )
 }
